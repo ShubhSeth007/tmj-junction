@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Music Junction - Instrument Repair & Jamming Space</title>
+    <link rel="icon" href="{{ url_for('static', filename='assets/img/TMJ.png') }}" type="image/png">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="loader">
+            <div class="music-note"></div>
+            <div class="music-note"></div>
+            <div class="music-note"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-container">
+                <!-- Logo Section -->
+                <a href="{{ url_for('index') }}" class="logo-section">
+                    <img src="{{ url_for('static', filename='assets/img/TMJ.png') }}" alt="The Music Junction Logo" class="logo-img">
+                    <span class="logo-text">The Music Junction</span>
+                </a>
+
+                <!-- Navigation -->
+                <nav class="navbar">
+                    <div class="menu-toggle" id="mobile-menu">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </div>
+
+                    <ul class="nav-links">
+                        <li><a href="{{ url_for('index') }}" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a href="{{ url_for('jampad') }}" class="nav-link"><i class="fas fa-guitar"></i> Jampad</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="nav-link"><i class="fas fa-phone"></i> Contact</a></li>
+                        <li><a href="{{ url_for('refund') }}" class="nav-link"><i class="fas fa-exchange-alt"></i> Refund Policy</a></li>
+                        <li><a href="{{ url_for('dashjamp') }}" class="nav-link admin-btn"><i class="fas fa-user-cog" target="_blank"></i> Admin</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <img src="{{ url_for('static', filename='assets/img/TMJ.png') }}" alt="The Music Junction Logo">
+                        <span>The Music Junction</span>
+                    </div>
+                    <p class="footer-about">Providing top-quality instrument repair services and premium jamming space
+                        for musicians since 2010.</p>
+                    <div class="footer-social">
+                        <a href="https://www.facebook.com/share/16S2BqRZJU/" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/themusicjunction.in?igsh=bG5rNzU3dG83Mnpn" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="https://youtube.com/@tmjthemusicjunction?si=-dnGaDbyeMRx0Iq7" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="{{ url_for('jampad') }}"><i class="fas fa-chevron-right"></i> Jampad</a></li>
+                         <li><a href="#"><i class="fas fa-chevron-right"></i> Admin</a></li>
+
+
+                        <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Instrument Repair</a></li>
+                        <li><a href="{{ url_for('jampad') }}"><i class="fas fa-chevron-right"></i> Jampad Booking</a></li>
+
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Instrument Sales</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Equipment Rental</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-contact">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Music Street, Melody City</li>
+                        <li><i class="fas fa-phone"></i> +1 (234) 567-890</li>
+                        <li><i class="fas fa-envelope"></i> contact@musicjunction.com</li>
+                        <li><i class="fas fa-clock"></i> Mon-Sat: 10AM - 8PM</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="footer-legal">
+                    <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                    <a href="{{ url_for('terms') }}">Terms and Conditions</a>
+                    <a href="{{ url_for('refund') }}">Refund Policy</a>
+                </div>
+                <div class="copyright">
+                    &copy; 2025 The Music Junction. All Rights Reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+
+</html>

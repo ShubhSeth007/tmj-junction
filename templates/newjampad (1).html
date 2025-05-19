@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Music Junction - JamPad Booking</title>
+    <link rel="icon" href="{{ url_for('static', filename='assets/img/TMJ.png') }}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+
+
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #fd79a8;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        
+
+        body {
+            padding-top: 4rem;
+            background-color: #f9f9f9;
+            color: var(--dark);
+            overflow-x: hidden;
+            margin-top: 50px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1  rem;
+        }
+
+        /* Gallery Section */
+        .gallery-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            color: var(--primary);
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            aspect-ratio: 16/9;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .gallery-item img, .gallery-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover .media-caption {
+            opacity: 1;
+        }
+
+       
+
+        /* Booking Section */
+        .booking-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .booking-title {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .booking-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+        }
+
+        .time-slots-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .time-slot input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .time-slot label {
+            display: block;
+            padding: 0.8rem;
+            background: #f1f1f1;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-slot input:checked + label {
+            background: var(--primary);
+            color: white;
+        }
+
+        #priceSummary {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+     
+    
+     
+    <header class="header">
+        <div class="container">
+            <div class="header-container">
+                <!-- Logo Section -->
+                <a href="{{ url_for('index') }}" class="logo-section">
+                     <img src="{{ url_for('static', filename='assets/img/TMJ.png') }}" alt="The Music Junction Logo" class="logo-img">
+                    <span class="logo-text">The Music Junction</span>
+                </a>
+                 <!-- Add this where you want messages to appear -->
+                <!-- Navigation -->
+                <nav class="navbar">
+                    <div class="menu-toggle" id="mobile-menu">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </div>
+
+                    <ul class="nav-links">
+                        <li><a href="{{ url_for('index') }}" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a href="{{ url_for('jampad') }}" class="nav-link"><i class="fas fa-guitar"></i> Jampad</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="nav-link"><i class="fas fa-phone"></i> Contact</a></li>
+                        <li><a href="{{ url_for('refund') }}" class="nav-link"><i class="fas fa-exchange-alt"></i> Refund Policy</a></li>
+                        <li><a href="{{ url_for('dashjamp') }}" class="nav-link admin-btn"><i class="fas fa-user-cog" target="_blank"></i> Admin</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Gallery Section -->
+       <section class="gallery-section">
+            <h2 class="section-title">The Music Junction  JamPad</h2>
+            <p style="text-align: center; margin-bottom: 1rem; color: #666; max-width: 800px; margin-left: auto; margin-right: auto;">
+                Our professional JamPad is a 500 sq.ft soundproof space equipped with premium instruments and recording gear. Perfect for bands, solo artists, and music producers looking for a creative space to practice, record, or jam.
+            </p>
+            
+            <div class="gallery-container">
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="JamPad Interior">
+                    <div class="media-caption">Main Studio Area with Yamaha Drum Kit</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Drum Set">
+                    <div class="media-caption">Pearl Export Drum Kit with Zildjian Cymbals</div>
+                </div>
+                <div class="gallery-item">
+                    <video controls poster="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80">
+                        <source src="#" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="media-caption">Studio Tour - See Our Setup</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1496293455970-f8581aae0e3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1113&q=80" alt="Recording Booth">
+                    <div class="media-caption">Isolated Vocal Booth with Neumann Mic</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Control Room">
+                    <div class="media-caption">Control Room with Presonus StudioLive</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1501612780327-45045538702b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Guitar Collection">
+                    <div class="media-caption">Guitar Collection: Fender, Gibson, Ibanez</div>
+                </div>
+            </div>
+            
+            <!-- Equipment List -->
+             
+            
+            
+        </section>
+
+        <!-- Booking Form -->
+        <section class="booking-section">
+            <h2 class="booking-title">Book Your Jam Session</h2>
+            <form id="bookingForm" class="booking-form" action="/jampad" method="post">
+                <div class="form-group full-width">
+                    <label class="form-label">Select JamPad</label>
+                    <div class="time-slots-container">
+                        <div class="time-slot" style="width:100%">
+                            <input type="radio" name="jampad" id="tmj" value="tmj" checked required>
+                            <label for="tmj" style="width:100%">The Music Junction (₹599/hr)</label>
+                        </div>
+                        <div class="time-slot" style="width:100%">
+                            <input type="radio" name="jampad" id="br" value="br" required>
+                            <label for="br" style="width:100%">Blue Raga (₹410/hr)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bandName" class="form-label">Band Name</label>
+                    <input type="text" name="bandName" id="bandName" class="form-control" required placeholder="Enter your Band Name">
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone" class="form-label">Phone</label>
+
+                    <input type="tel" id="phone" name="phone" class="form-control"required pattern="^\d{10}$" minlength="10" maxlength="10" placeholder="Enter 10-digit phone number">
+
+                </div>
+
+                <div class="form-group">
+                    <label for="people" class="form-label">Number of People</label>
+                    <input type="number" name="people" id="people" class="form-control"
+                           min="1" required onchange="calculatePrice()">
+                </div>
+
+                <div class="form-group">
+                    <label for="mics" class="form-label">Microphones</label>
+                    <input type="number" name="mics" id="mics" class="form-control"
+                           min="1" required onchange="calculatePrice()">
+                </div>
+
+                <div class="form-group">
+                    <label for="bookingDate" class="form-label">Date</label>
+                    <input type="text" name="bookingDate" id="bookingDate" class="form-control flatpickr-input" readonly required>
+                </div>
+
+                <div class="form-group full-width">
+    <label class="form-label">Time Slots (1hr each)</label>
+    <div class="time-slots-container" id="timeSlots">
+        <!-- Time slots will be generated here -->
+    </div>
+    <input type="hidden" name="timeSlots" id="timeSlotsHidden">
+</div>
+
+                <div class="form-group full-width" id="priceSummary">
+                    <h3>Price Breakdown</h3>
+                    <div id="priceDetails"></div>
+                    <h3>Total: ₹<span id="totalAmount">0</span></h3>
+                </div>
+
+                <div class="form-group full-width">
+                     <div class="refund-policy">
+                        <input type="checkbox" id="agreePolicy" required>
+                        <label for="agreePolicy">I have read and agree to the <a href="refund-policy.html" style="color: var(--primary);">Refund policy</a>. I understand that cancellations made within 24 hours before the booking will not</label>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-lock"></i> Submit and Make Payment
+                    </button>
+                </div>
+                <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <h2>Booking Confirmation</h2>
+        <div id="confirmationMessage"></div>
+        <button onclick="closeModal()" class="modal-close">Close</button>
+    </div>
+</div>
+            </form>
+        </section>
+    </div>
+
+    
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <img src="TMJ final logo.png" alt="The Music Junction Logo">
+                        <span>The Music Junction</span>
+                    </div>
+                    <p class="footer-about">Providing top-quality instrument repair services and premium jamming space
+                        for musicians since 2010.</p>
+                    <div class="footer-social">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="jampad.html"><i class="fas fa-chevron-right"></i> Jampad</a></li>
+                        <li><a href="services.html"><i class="fas fa-chevron-right"></i> Services</a></li>
+                        <li><a href="gallery.html"><i class="fas fa-chevron-right"></i> Gallery</a></li>
+                        <li><a href="contact.html"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="services.html#repair"><i class="fas fa-chevron-right"></i> Instrument Repair</a>
+                        </li>
+                        <li><a href="jampad.html"><i class="fas fa-chevron-right"></i> Jampad Booking</a></li>
+                        <li><a href="services.html#lessons"><i class="fas fa-chevron-right"></i> Music Lessons</a></li>
+                        <li><a href="services.html#sales"><i class="fas fa-chevron-right"></i> Instrument Sales</a></li>
+                        <li><a href="services.html#rental"><i class="fas fa-chevron-right"></i> Equipment Rental</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-contact">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Music Street, Melody City</li>
+                        <li><i class="fas fa-phone"></i> +1 (234) 567-890</li>
+                        <li><i class="fas fa-envelope"></i> contact@musicjunction.com</li>
+                        <li><i class="fas fa-clock"></i> Mon-Sat: 10AM - 8PM</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="footer-legal">
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                    <a href="terms.html">Terms and Conditions</a>
+                    <a href="refund-policy.html">Refund Policy</a>
+                </div>
+                <div class="copyright">
+                    &copy; 2025 The Music Junction. All Rights Reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // Initialize Date Picker
+    const datePicker = flatpickr("#bookingDate", {
+        minDate: "today",
+        dateFormat: "d-m-Y",
+        disable: [date => date.getDay() === 0]
+    });
+
+    // Generate Time Slots
+    const timeSlotsContainer = document.getElementById('timeSlots');
+    for(let hour = 8; hour <= 22; hour++) {
+        const slot = document.createElement('div');
+        slot.className = 'time-slot';
+        slot.innerHTML = `
+            <input type="checkbox" id="slot${hour}" name="slot${hour}" value="${hour}:00-${hour+1}:00"
+                   onchange="calculatePrice()">
+            <label for="slot${hour}">${hour}:00 - ${hour+1}:00</label>
+        `;
+        timeSlotsContainer.appendChild(slot);
+    }
+
+    // Pricing Calculator
+    function calculatePrice() {
+        const isTMJ = document.getElementById('tmj').checked;
+        const people = parseInt(document.getElementById('people').value) || 0;
+        const mics = parseInt(document.getElementById('mics').value) || 0;
+        const slots = document.querySelectorAll('input[type="checkbox"][name^="slot"]:checked').length;
+
+        // Update people limits
+        const maxPeople = isTMJ ? 11 : 15;
+        document.getElementById('people').max = maxPeople;
+
+        // Validate people input
+        if(people > maxPeople) {
+            alert(`Maximum ${maxPeople} people allowed for this JamPad`);
+            document.getElementById('people').value = maxPeople;
+            return;
+        }
+
+        // Base Price Calculation
+        let basePrice = 0;
+        if(isTMJ) {
+            basePrice = slots >= 2 ? 1198 + (slots-2)*499 : 599*slots;
+        } else {
+            basePrice = slots >= 2 ? 820 + (slots-2)*360 : 410*slots;
+        }
+
+        // Extra Charges
+        const freePeople = isTMJ ? 9 : 7;
+        const freeMics = 5;
+        const peopleCharge = Math.max(people - freePeople, 0) * 60;
+        const micCharge = Math.max(mics - freeMics, 0) * 60;
+
+        const total = basePrice + peopleCharge + micCharge;
+
+        // Update Display
+        document.getElementById('priceDetails').innerHTML = `
+            <p>Base Price (${slots} hrs): ₹${basePrice}</p>
+            ${peopleCharge > 0 ? `<p>Extra People: ₹${peopleCharge}</p>` : ''}
+            ${micCharge > 0 ? `<p>Extra Mics: ₹${micCharge}</p>` : ''}
+        `;
+        document.getElementById('totalAmount').textContent = total;
+    }
+
+    // Form Submission Handler
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        // Only prevent default if validation fails
+        let shouldSubmit = true;
+
+        // Collect all checked time slots
+        const timeSlots = [];
+        document.querySelectorAll('input[type="checkbox"][name^="slot"]:checked').forEach(slot => {
+            timeSlots.push(slot.value);
+        });
+
+        if (timeSlots.length === 0) {
+            alert("Please select at least one time slot");
+            e.preventDefault();
+            shouldSubmit = false;
+            return;
+        }
+
+        // Update hidden timeSlots field
+        document.getElementById('timeSlotsHidden').value = timeSlots.join(',');
+
+        // Calculate final price
+        calculatePrice();
+
+        // Only prevent default if we found issues
+        if (!shouldSubmit) {
+            e.preventDefault();
+        }
+        // Otherwise, let the form submit normally to your Flask route
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        calculatePrice();
+
+        // Add event listeners for other form fields
+        document.getElementById('people').addEventListener('input', calculatePrice);
+        document.getElementById('mics').addEventListener('input', calculatePrice);
+        document.querySelectorAll('input[name="jampad"]').forEach(radio => {
+            radio.addEventListener('change', calculatePrice);
+        });
+    });
+
+    function closeModal() {
+        document.getElementById('confirmationModal').style.display = 'none';
+        document.getElementById('bookingForm').reset();
+        datePicker.clear();
+        document.querySelectorAll('input[type="checkbox"][name^="slot"]').forEach(slot => {
+            slot.checked = false;
+        });
+        calculatePrice();
+    }
+
+    // Mobile Menu Toggle
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    menuToggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+        navLinks.classList.toggle('active');
+    });
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            menuToggle.classList.remove('active');
+            navLinks.classList.remove('active');
+        });
+    });
+</script>
+</body>
+</html>
