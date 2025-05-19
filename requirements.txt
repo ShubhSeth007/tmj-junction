@@ -1,0 +1,7 @@
+Flask
+Flask-SQLAlchemy
+Flask-Mail
+requests
+Werkzeug
+gunicorn
+pymysql
