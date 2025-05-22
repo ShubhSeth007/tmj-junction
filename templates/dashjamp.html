@@ -721,6 +721,17 @@
         // Initial load
         generateTimeSlots();
     });
+
+     // Mobile menu toggle (if not already in your main JS)
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (mobileMenu) {
+            mobileMenu.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+        }
 </script>
 </body>
 </html>

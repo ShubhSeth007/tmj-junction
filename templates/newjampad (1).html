@@ -356,7 +356,8 @@
             <h2 class="booking-title">Book Your Jam Session</h2>
             <form id="bookingForm" class="booking-form" action="/jampad" method="post">
                 <div class="form-group full-width">
-                    <label class="form-label">Select JamPad</label>
+                    <label for="tmj" class="form-label">Select JamPad</label>
+
                     <div id="slotWarning" style="color: red; font-weight: bold; margin-top: 10px;"></div>
 
                     <div class="time-slots-container">
@@ -669,6 +670,17 @@
         // Initial load
         generateTimeSlots();
     });
+
+     // Mobile menu toggle (if not already in your main JS)
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (mobileMenu) {
+            mobileMenu.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+        }
 </script>
 </body>
 </html>
