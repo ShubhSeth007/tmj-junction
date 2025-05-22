@@ -64,7 +64,7 @@ class bookin(db.Model):
     no_of_people = db.Column(db.String(5), nullable=False)
     microphones = db.Column(db.String(5), nullable=False)
     booking_date = db.Column(db.String(10), nullable=False)  # Stored as string
-    time_slots = db.Column(db.String(50), nullable=False)
+    time_slots = db.Column(db.String(200), nullable=False)
     date = db.Column(db.String(12), nullable=True)
 
 
