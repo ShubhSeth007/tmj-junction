@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
 import json
 from werkzeug.utils import secure_filename
 from sqlalchemy import text
 from datetime import datetime
+
 import os
 import math
 
@@ -25,7 +26,7 @@ app.secret_key = params.get('secret_key', 'super-secret-key')  # Get from config
 app.config['UPLOAD_FOLDER'] = params.get("folder_location", "uploads")
 
 # Initialize Mail if configured
-mail = Mail()
+mail = Mail(app)
 if params.get('gmail-user') and params.get('gmail-password'):
     app.config.update(
         MAIL_SERVER='smtp.gmail.com',
@@ -62,8 +63,8 @@ class bookin(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     no_of_people = db.Column(db.String(5), nullable=False)
     microphones = db.Column(db.String(5), nullable=False)
-    booking_date = db.Column(db.String(5), nullable=False)  # Stored as string
-    time_slots = db.Column(db.String(20), nullable=False)
+    booking_date = db.Column(db.String(10), nullable=False)  # Stored as string
+    time_slots = db.Column(db.String(50), nullable=False)
     date = db.Column(db.String(12), nullable=True)
 
 
@@ -101,6 +102,13 @@ def contact():
             )
             db.session.add(entry)
             db.session.commit()
+            if params:
+                mail.send_message(
+                    'New message from ' + name,
+                    sender=email,
+                    recipients=[params.get('gmail-user')],
+                    body= "message:" + message + "\n" + "phone:" + phone + "\n" + "subject:" + sub + "\n" + "email:" + email
+                )
             flash('Your message has been sent!', 'success')
         except Exception as e:
             db.session.rollback()
@@ -123,7 +131,7 @@ def dashjamp():
             flash('Invalid credentials', 'error')
 
     if "user" in session and session['user'] == params.get('admin_user'):
-        return render_template("view_bookings.html", params=params)
+        return render_template("dashjamp.html", params=params)
 
     return render_template("admin.html", params=params)
 
@@ -148,7 +156,7 @@ def jampad():
                 flash('Please fill all required fields', 'error')
                 return redirect(url_for('jampad'))
 
-            # Fix: Convert frontend dd-mm-yyyy to yyyy-mm-dd
+            # Convert date format from dd-mm-yyyy to yyyy-mm-dd
             try:
                 booking_date_obj = datetime.strptime(booking_date_str, '%d-%m-%Y')
                 date_str = booking_date_obj.strftime('%Y-%m-%d')
@@ -156,13 +164,21 @@ def jampad():
                 flash('Invalid date format. Use DD-MM-YYYY', 'error')
                 return redirect(url_for('jampad'))
 
-            # Optional: Check for exact slot conflict on same day
-            existing = bookin.query.filter_by(booking_date=date_str, time_slots=time_slots).first()
-            if existing:
-                flash('This time slot is already booked!', 'error')
-                return redirect(url_for('jampad'))
+            # Check if exact slot already booked
+            existing = bookin.query.filter_by(
+                booking_date=date_str,
+                jampad_name=jampad_name
+            ).all()
+            for booking in existing:
+                existing_slots = set(booking.time_slots.split(','))
 
-            # Create and save booking
+                new_slots = set(time_slots.split(','))
+                if existing_slots & new_slots:  # if there is any overlap
+                    print("Matched Existing:", booking)
+                    flash('One or more selected time slots are already booked!', 'error')
+                    return render_template('newjampad (1).html', params=params, existing_booking=booking)
+
+            # Create new booking
             new_booking = bookin(
                 jampad_name=jampad_name,
                 band_name=band_name,
@@ -177,9 +193,17 @@ def jampad():
 
             db.session.add(new_booking)
             db.session.commit()
+            if params:
+                mail.send_message(
+                    'New message from ' + jampad_name,
+                    sender=email,
+                    recipients=[params.get('gmail-user')],
+                    body= "jampad:" + jampad_name + "\n" + "phone:" + phone + "\n" + "time_slots:" + time_slots + "\n" + "band_name:" + band_name
+                )
+            if "user" in session and session['user'] == params.get('admin_user'):
+                flash('Booking recorded without payment (Admin Mode)', 'info')
+                return redirect(url_for('dashjamp'))
             return redirect(url_for('pay', booking_id=new_booking.sno))
-
-
 
         except Exception as e:
             db.session.rollback()
@@ -187,7 +211,9 @@ def jampad():
             app.logger.error(f"Booking error: {str(e)}")
             return redirect(url_for('jampad'))
 
+    # GET request
     return render_template('newjampad (1).html', params=params)
+
 
 @app.route('/view_bookings', methods=['GET'])
 def view_bookings():
@@ -219,6 +245,7 @@ def view_bookings():
                            params=params)
 
 
+
 @app.route('/delete/<int:booking_id>', methods=['POST'])
 def delete_booking(booking_id):
     if "user" not in session or session['user'] != params.get('admin_user'):
@@ -235,6 +262,46 @@ def delete_booking(booking_id):
         app.logger.error(f"Delete booking error: {str(e)}")
 
     return redirect(url_for('view_bookings'))
+
+
+@app.route('/get_booked_slots', methods=['GET'])
+def get_booked_slots():
+    jam_pad = request.args.get('jampad')  # Get the jampad name from request
+    date_str = request.args.get('date')
+
+    print(f"Received request - jampad: {jam_pad}, date: {date_str}")
+    if not date_str:
+        return jsonify({"error": "Date parameter missing"}), 400
+
+    try:
+        # Convert input date string to match your database format
+        date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+        db_date_str = date_obj.strftime('%Y-%m-%d')  # adjust if DB format is different
+
+        # Query bookings for the specified date AND jampad
+        query = bookin.query.filter_by(booking_date=db_date_str)
+        if jam_pad:
+            query = query.filter_by(jampad_name=jam_pad)
+
+        bookings = query.all()
+        booked_slots = []
+
+        for booking in bookings:
+            if booking.time_slots:
+                booked_slots.extend(booking.time_slots.split(','))
+
+        # Print for confirmation
+        print(f"Booked slots for {jam_pad} on {date_str}: {booked_slots}")
+
+        return jsonify({
+            "date": date_str,
+            "jampad": jam_pad,
+            "booked_slots": booked_slots
+        })
+
+    except Exception as e:
+        print(f"Error fetching booked slots: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/refund")
@@ -271,11 +338,17 @@ def logout():
 
 @app.route("/privac")
 def privacy():
-    return render_template('privacy-policy.html', params=params)
+    return render_template('privacy policy.html', params=params)
 
 @app.route("/terms")
 def terms():
-    return render_template('terms.html', params=params)
+    return render_template('terms-no-toggle.html', params=params)
+@app.route("/admin")
+def admin():
+    return render_template('admin.html', params=params)
+
+
+
 
 
 @app.route('/test_db')

@@ -105,18 +105,18 @@ document.addEventListener('DOMContentLoaded', function() {
             "thumbs",
             "close"
         ],
-        animationEffect: "zoom-in-out",
+
         transitionEffect: "tube",
         loop: true
     });
 });
 
 const mainHeading = document.querySelector('div h1');
-    
+
     if (mainHeading) {
       const text = mainHeading.textContent;
       mainHeading.textContent = '';
-      
+
       let i = 0;
       const typeWriter = setInterval(() => {
         if (i < text.length) {
@@ -136,4 +136,4 @@ const mainHeading = document.querySelector('div h1');
         heading.classList.add('pulse');
       }
     });
-    
+

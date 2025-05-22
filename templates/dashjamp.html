@@ -1,485 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Music Junction - Instrument Repair & Jamming Space</title>
-    <link rel="icon" href="{{ url_for('static', filename='assets/img/logo.jpeg') }}" type="image/jpeg">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-
-    <!-- Main CSS -->
+    <title>The Music Junction - JamPad Booking</title>
+    <link rel="icon" href="{{ url_for('static', filename='assets/img/TMJ.png') }}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
     <style>
-        body {
+    :root {
+        --primary: #6c5ce7;
+        --secondary: #a29bfe;
+        --accent: #fd79a8;
+        --dark: #2d3436;
+        --light: #f5f6fa;
+    }
 
-    padding-top: 3rem;  /* Add top padding to create space */
-     }
+    /* Jampad selection styles */
+    .jampad-option {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
 
-      main {
-    flex: 1;
-    padding-top: 3rem; /* Ensure the main section starts with some space */
-     }
+    .jampad-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
 
-     header {
-      flex-shrink: 0;
-    padding: 1rem 0; /* Adjust the top and bottom padding */
-     }
+    .jampad-option label {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background: #f1f1f1;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
 
-        :root {
-            --primary: #6c5ce7;
-            --secondary: #a29bfe;
-            --accent: #fd79a8;
-            --dark: #2d3436;
-            --light: #f5f6fa;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1  rem;
-        }
-
-        /* Gallery Section */
-        .gallery-section {
-            margin-bottom: 3rem;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 2rem;
-            position: relative;
-            font-size: 2.5rem;
-            color: var(--primary);
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 4px;
-            background: var(--accent);
-            border-radius: 2px;
-        }
-
-        .gallery-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .gallery-item {
-            position: relative;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            aspect-ratio: 16/9;
-        }
-
-        .gallery-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .gallery-item img, .gallery-item video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .gallery-item .media-caption {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            color: white;
-            padding: 1rem;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .gallery-item:hover .media-caption {
-            opacity: 1;
-        }
-
-        /* Booking Form */
-        .booking-section {
-            background: white;
-            border-radius: 15px;
-            padding: 2.5rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            animation: slideUp 1s ease-in-out;
-        }
-
-        .booking-title {
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-            font-size: 2rem;
-            text-align: center;
-        }
-
-        .booking-form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group.full-width {
-            grid-column: span 2;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
-        }
-
-        /* Time Slots */
-        .time-slots-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 0.8rem;
-            margin-top: 1rem;
-        }
-
-        .time-slot {
-            position: relative;
-        }
-
-        .time-slot input {
-            position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .time-slot label {
-            display: block;
-            padding: 0.8rem;
-            background: #f1f1f1;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .time-slot input:checked + label {
-            background: var(--primary);
-            color: white;
-        }
-
-        .time-slot input:disabled + label {
-            background: #e0e0e0;
-            color: #aaa;
-            cursor: not-allowed;
-            position: relative;
-        }
-
-        .time-slot input:disabled + label::after {
-            content: "✗";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.2rem;
-            color: #ff6b6b;
-        }
-
-        /* Payment Section */
-        .payment-section {
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid #eee;
-        }
-
-        .refund-policy {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 1.5rem;
-        }
-
-        .refund-policy input {
-            margin-right: 0.8rem;
-            margin-top: 0.2rem;
-        }
-
-        .submit-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.8rem;
-            margin-top: 1rem;
-            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
-        }
-
-        .logout{
+    .jampad-option input[type="radio"]:checked + label {
         background: var(--primary);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.8rem;
-            margin-top: 1rem;
-            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
-        }
+        color: white;
+        border-color: var(--primary);
+    }
 
-        .logout:hover{
-            background: var(--accent);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(253, 121, 168, 0.4);
-        }
-        .submit-btn:hover {
-            background: var(--accent);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(253, 121, 168, 0.4);
-        }
+    .jampad-option input[type="radio"]:focus + label {
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+    }
 
-        .submit-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+    /* Time slot styles */
+    .time-slot-label {
+        display: block;
+        padding: 0.8rem;
+        background: #f1f1f1;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 5px;
+    }
 
-        /* Error Message */
-        .error-message {
-            color: #dc3545;
-            margin-bottom: 1rem;
-            padding: 0.5rem;
-            border-radius: 4px;
-            background-color: #f8d7da;
-            display: none;
-        }
+    .time-slot-label.selected {
+        background: var(--primary);
+        color: white;
+    }
 
-        /* Price Display */
-        .price-display {
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
+    .time-slot.booked .time-slot-label {
+        background: #e0e0e0;
+        color: #999;
+        cursor: not-allowed;
+        text-decoration: line-through;
+    }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+    /* Rest of your existing styles */
+    body {
+        padding-top: 4rem;
+        background-color: #f9f9f9;
+        color: var(--dark);
+        overflow-x: hidden;
+        margin-top: 50px;
+    }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
 
-        /* Equipment List */
-        .equipment-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
+    .gallery-section {
+        margin-bottom: 3rem;
+    }
 
-        .equipment-item {
-            background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
+    .section-title {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 2.5rem;
+        color: var(--primary);
+        position: relative;
+    }
 
-        .equipment-icon {
-            color: var(--primary);
-            font-size: 1.5rem;
-        }
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: var(--accent);
+        border-radius: 2px;
+    }
 
-        /* Visually hidden for accessibility */
-        .visually-hidden {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
+    .gallery-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .booking-form {
-                grid-template-columns: 1fr;
-            }
+    .gallery-item {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        aspect-ratio: 16/9;
+    }
 
-            .form-group.full-width {
-                grid-column: span 1;
-            }
+    .gallery-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
 
-            .time-slots-container {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            }
+    .gallery-item img, .gallery-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 
-            .gallery-item {
-                aspect-ratio: 1/1;
-            }
-        }
+    .media-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        color: white;
+        padding: 1rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
 
-        /* Confirmation Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s ease;
-        }
+    .flashes .alert {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    .alert.error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    .alert.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .existing-booking-info {
+        background-color: #fff3cd;
+        border-left: 5px solid #856404;
+        padding: 15px;
+        margin: 15px 0;
+    }
 
-        .modal-content {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-            position: relative;
-            animation: slideUp 0.4s ease;
-        }
+    .gallery-item:hover .media-caption {
+        opacity: 1;
+    }
 
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #aaa;
-            transition: color 0.3s ease;
-        }
+    .booking-section {
+        background: white;
+        border-radius: 15px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
 
-        .modal-close:hover {
-            color: var(--dark);
-        }
+    .booking-title {
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+        text-align: center;
+    }
 
-        .modal-icon {
-            font-size: 4rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-            animation: bounce 1s infinite alternate;
-        }
+    .booking-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
 
-        @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-10px); }
-        }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
 
-        /* Loading Spinner */
-        .spinner {
-            display: none;
-            width: 40px;
-            height: 40px;
-            margin: 0 auto;
-            border: 4px solid rgba(108, 92, 231, 0.2);
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 1s ease-in-out infinite;
-        }
+    .form-group.full-width {
+        grid-column: span 2;
+    }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+    }
+
+    .time-slots-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.8rem;
+        margin-top: 1rem;
+    }
+
+    #priceSummary {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+    }
+    .btn button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.btn-logout button {
+  background-color: #dc3545;
+}
+
+.btn-logout button:hover {
+  background-color: #a71d2a;
+}
+
+.btn-bookings button {
+  background-color: #28a745;
+}
+
+.btn-bookings button:hover {
+  background-color: #1e7e34;
+}
+
+.btn i {
+  font-size: 16px;
+}
+
+    .submit-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+    }
+</style>
 </head>
-
 <body>
-    <!-- Preloader -->
-    <div class="preloader">
-        <div class="loader">
-            <div class="music-note"></div>
-            <div class="music-note"></div>
-            <div class="music-note"></div>
-        </div>
-    </div>
 
-    <!-- Header -->
+
+
     <header class="header">
         <div class="container">
             <div class="header-container">
                 <!-- Logo Section -->
                 <a href="{{ url_for('index') }}" class="logo-section">
-                    <img src="{{ url_for('static', filename='assets/img/logo.jpeg') }}" alt="The Music Junction Logo" class="logo-img">
+                     <img src="{{ url_for('static', filename='assets/img/TMJ.png') }}" alt="The Music Junction Logo" class="logo-img">
                     <span class="logo-text">The Music Junction</span>
                 </a>
-
+                 <!-- Add this where you want messages to appear -->
                 <!-- Navigation -->
                 <nav class="navbar">
                     <div class="menu-toggle" id="mobile-menu">
@@ -493,217 +343,181 @@
                         <li><a href="{{ url_for('jampad') }}" class="nav-link"><i class="fas fa-guitar"></i> Jampad</a></li>
                         <li><a href="{{ url_for('contact') }}" class="nav-link"><i class="fas fa-phone"></i> Contact</a></li>
                         <li><a href="{{ url_for('refund') }}" class="nav-link"><i class="fas fa-exchange-alt"></i> Refund Policy</a></li>
-                        <li><a href="{{ url_for('dashjamp') }}" class="nav-link admin-btn"><i class="fas fa-user-cog"></i> Admin</a></li>
+                        <li><a href="{{ url_for('dashjamp') }}" class="nav-link admin-btn"><i class="fas fa-user-cog" target="_blank"></i> Admin</a></li>
                     </ul>
                 </nav>
             </div>
         </div>
     </header>
+    <div class="container">
+        <!-- Gallery Section -->
+       <section class="gallery-section">
+            <h2 class="section-title">The Music Junction  JamPad</h2>
+            <p style="text-align: center; margin-bottom: 1rem; color: #666; max-width: 800px; margin-left: auto; margin-right: auto;">
+                Our professional JamPad is a soundproof space equipped with premium instruments . Perfect for bands, solo artists looking for a creative space to practice or jam.
+            </p>
 
-    <main>
-        <div class="container">
-            <!-- JamPad Gallery Section -->
-            <section class="gallery-section">
-                <h2 class="section-title">The Music Junction JamPad</h2>
-                <p style="text-align: center; margin-bottom: 1rem; color: #666; max-width: 800px; margin-left: auto; margin-right: auto;">
-                    Our professional JamPad is a 500 sq.ft soundproof space equipped with premium instruments and recording gear. Perfect for bands, solo artists, and music producers looking for a creative space to practice, record, or jam.
-                </p>
-
-                <div class="gallery-container">
-                    <div class="gallery-item">
-                        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="JamPad Interior with Yamaha Drum Kit">
-                        <div class="media-caption">Main Studio Area with Yamaha Drum Kit</div>
-                    </div>
-                    <div class="gallery-item">
-                        <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Pearl Export Drum Kit with Zildjian Cymbals">
-                        <div class="media-caption">Pearl Export Drum Kit with Zildjian Cymbals</div>
-                    </div>
-                    <div class="gallery-item">
-                        <video controls poster="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" aria-label="Studio Tour Video">
-                            <source src="{{ url_for('static', filename='videos/studio-tour.mp4') }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <div class="media-caption">Studio Tour - See Our Setup</div>
-                    </div>
-                    <div class="gallery-item">
-                        <img src="https://images.unsplash.com/photo-1496293455970-f8581aae0e3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1113&q=80" alt="Isolated Vocal Booth with Neumann Microphone">
-                        <div class="media-caption">Isolated Vocal Booth with Neumann Mic</div>
-                    </div>
-                    <div class="gallery-item">
-                        <img src="https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Control Room with Presonus StudioLive">
-                        <div class="media-caption">Control Room with Presonus StudioLive</div>
-                    </div>
-                    <div class="gallery-item">
-                        <img src="https://images.unsplash.com/photo-1501612780327-45045538702b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Guitar Collection including Fender, Gibson, and Ibanez">
-                        <div class="media-caption">Guitar Collection: Fender, Gibson, Ibanez</div>
-                    </div>
+            <div class="gallery-container">
+                <div class="gallery-item">
+                    <img src="/static/assets/img/personjampad.jpeg" alt="JamPad Interior">
+                    <div class="media-caption">Main Jampad area</div>
                 </div>
-
-                <!-- Equipment List -->
-                <h3 style="margin-top: 2rem; text-align: center; color: var(--primary);">Available Equipment</h3>
-                <div class="equipment-list">
-                    <div class="equipment-item">
-                        <i class="fas fa-drum equipment-icon" aria-hidden="true"></i>
-                        <span>Pearl Export Drum Kit</span>
-                    </div>
-                    <div class="equipment-item">
-                        <i class="fas fa-guitar equipment-icon" aria-hidden="true"></i>
-                        <span>Fender Stratocaster</span>
-                    </div>
-                    <div class="equipment-item">
-                        <i class="fas fa-guitar equipment-icon" aria-hidden="true"></i>
-                        <span>Gibson Les Paul</span>
-                    </div>
-                    <div class="equipment-item">
-                        <i class="fas fa-microphone equipment-icon" aria-hidden="true"></i>
-                        <span>Neumann U87 Mic</span>
-                    </div>
-                    <div class="equipment-item">
-                        <i class="fas fa-sliders-h equipment-icon" aria-hidden="true"></i>
-                        <span>Presonus StudioLive 24</span>
-                    </div>
-                    <div class="equipment-item">
-                        <i class="fas fa-keyboard equipment-icon" aria-hidden="true"></i>
-                        <span>Yamaha P-125 Piano</span>
-                    </div>
-                    <div class="equipment-item">
-                        <i class="fas fa-volume-up equipment-icon" aria-hidden="true"></i>
-                        <span>KRK Rokit Monitors</span>
-                    </div>
-                    <div class="equipment-item">
-                        <i class="fas fa-headphones equipment-icon" aria-hidden="true"></i>
-                        <span>Beyerdynamic DT770</span>
-                    </div>
+                <div class="gallery-item">
+                    <img src="/static/assets/img/mixerjampadtmj.jpeg" alt="Drum Set">
+                    <div class="media-caption">TMJ</div>
                 </div>
-            </section>
-
-            <!-- Booking Form Section -->
-            <section class="booking-section">
-                <h2 class="booking-title">Book Your Jam Session</h2>
-
-                <form id="bookingForm" class="booking-form" method="POST">
-
-
-                    <div id="formErrors" class="error-message" role="alert"></div>
-
-                    <div class="form-group">
-                        <label for="bandName" class="form-label">Band Name</label>
-                        <input type="text" id="bandName" name="bandName" class="form-control" required placeholder="Enter your Band Name" aria-required="true">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email" class="form-label">Email Address</label>
-                        <input type="email" id="email" name="email" class="form-control" required placeholder="Enter your email address" aria-required="true">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="phone" class="form-label">Mobile Number</label>
-                        <input type="tel" id="phone" name="phone" class="form-control" required
-                               placeholder="Enter your 10-digit contact number"
-                               pattern="[0-9]{10}"
-                               aria-required="true"
-                               aria-describedby="phoneHelp">
-                        <small id="phoneHelp" class="form-text">10 digits only, no spaces or dashes</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="numberofpersons" class="form-label">Number of Persons</label>
-                        <input type="number" id="numberofpersons" name="numberofpersons" class="form-control"
-                               required min="1" max="20"
-                               placeholder="Persons more than 7 charged ₹60 per Head"
-                               aria-required="true">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="numberofmics" class="form-label">Number of Microphones</label>
-                        <input type="number" id="numberofmics" name="numberofmics" class="form-control"
-                               required min="1" max="10"
-                               placeholder="Microphones more than 7 charged ₹60 each"
-                               aria-required="true">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="bookingDate" class="form-label">Booking Date</label>
-                        <input type="date" id="bookingDate" name="bookingDate" class="form-control flatpickr-input"
-                               placeholder="Select Date" readonly required
-                               aria-required="true">
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label class="form-label">Select Time Slot(s) - ₹600/hour</label>
-                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">
-                            Book multiple slots for extended sessions. Slots marked with ✗ are already booked.
-                        </p>
-                        <div class="time-slots-container" id="timeSlots" role="group" aria-labelledby="timeSlotsLabel">
-                            <span id="timeSlotsLabel" class="visually-hidden">Available time slots</span>
-                            <!-- Time slots will be generated by JavaScript -->
-                        </div>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="specialRequests" class="form-label">Special Requests</label>
-                        <textarea id="specialRequests" name="specialRequests" class="form-control" rows="3"
-                                  placeholder="Any specific equipment or setup requirements (additional instruments, microphone placement, etc.)"></textarea>
-                    </div>
-
-                    <div class="payment-section">
-                        <div id="priceDisplay" class="price-display">Total: ₹0</div>
-
-                        <div class="refund-policy">
-                            <input type="checkbox" id="agreePolicy" name="agreePolicy" required aria-required="true">
-                            <label for="agreePolicy">I have read and agree to the <a href="{{ url_for('refund') }}" style="color: var(--primary);">Refund policy</a>. I understand that cancellations made less than 24 hours before the booking will not be refunded.</label>
-                        </div>
-
-                        <div class="spinner" id="loadingSpinner" aria-hidden="true"></div>
-
-                        <button type="submit" class="submit-btn" id="submitBtn">
-                            <i class="fas fa-lock" aria-hidden="true"></i> Submit
-                        </button>
-                        <a href="/logout" class="logout-link">
-                         <button type="button" class="logout" id="logout">
-                          <i class="fas fa-lock" aria-hidden="true"></i> Logout
-                           </button>
-                            </a>
-                        <a href="/view_bookings" >
-                         <button type="button" class="logout" id="logout">
-                          <i  aria-hidden="true"></i> Bookings
-                           </button>
-                            </a>
-                    </div>
-                </form>
-            </section>
-        </div>
-
-        <!-- Confirmation Modal -->
-        <div class="modal" id="confirmationModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-            <div class="modal-content">
-                <button class="modal-close" id="modalClose" aria-label="Close modal">&times;</button>
-                <div class="modal-icon">
-                    <i class="fas fa-check-circle" aria-hidden="true"></i>
+                <div class="gallery-item">
+                    <img src="/static/assets/img/jampadtmj.jpeg" alt="Recording Booth">
+                    <div class="media-caption">TMJ</div>
+                    <div class="media-caption">TMJ</div>
                 </div>
-                <h2 id="modalTitle">Booking Confirmed!</h2>
-                <p id="confirmationMessage">Your jam session has been successfully booked. A confirmation has been sent to your email.</p>
-                <button class="submit-btn" id="modalOkBtn" style="margin-top: 1.5rem;">OK</button>
+                <div class="gallery-item">
+                    <img src="/static/assets/img/jampadtmj.jpeg" alt="Recording Booth">
+                    <div class="media-caption">TMJ</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/assets/img/marshaltmj.jpeg" alt="Control Room">
+                    <div class="media-caption">TMJ</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="/static/assets/img/drumrmj.jpg" alt="Guitar Collection">
+                    <div class="media-caption">TMJ</div>
+                </div>
             </div>
-        </div>
-    </main>
+
+            <!-- Equipment List -->
+
+
+
+        </section>
+
+        <!-- Booking Form -->
+        <section class="booking-section">
+            <h2 class="booking-title">Book Your Jam Session</h2>
+            <form id="bookingForm" class="booking-form" action="/jampad" method="post">
+                <div class="form-group full-width">
+                    <label class="form-label">Select JamPad</label>
+                    <div id="slotWarning" style="color: red; font-weight: bold; margin-top: 10px;"></div>
+
+                    <div class="time-slots-container">
+                        <div class="time-slot" style="width:100%">
+                            <input type="radio" name="jampad" id="tmj" value="tmj" checked required>
+                            <label for="tmj" style="width:100%">The Music Junction (₹599/hr)</label>
+                        </div>
+                        <div class="time-slot" style="width:100%">
+                            <input type="radio" name="jampad" id="br" value="br" required>
+                            <label for="br" style="width:100%">Blue Raga (₹410/hr)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bandName" class="form-label">Band Name</label>
+                    <input type="text" name="bandName" id="bandName" class="form-control" required placeholder="Enter your Band Name">
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone" class="form-label">Phone</label>
+
+                    <input type="tel" id="phone" name="phone" class="form-control"required pattern="^\d{10}$" minlength="10" maxlength="10" placeholder="Enter 10-digit phone number">
+
+                </div>
+
+                <div class="form-group">
+                    <label for="people" class="form-label">Number of People</label>
+                    <input type="number" name="people" id="people" class="form-control"
+                           min="1" required onchange="calculatePrice()" placeholder="9 people for TMJ Jampad  and 7 for BR Jampad are free">
+                </div>
+
+                <div class="form-group">
+                    <label for="mics" class="form-label">Microphones</label>
+                    <input type="number" name="mics" id="mics" class="form-control"
+                           min="1" required onchange="calculatePrice()" PLACEHOLDER="5 Microphones are free for both jampads">
+                </div>
+
+                <div class="form-group">
+                    <label for="bookingDate" class="form-label">Date</label>
+                    <input type="text" name="bookingDate" id="bookingDate" class="form-control flatpickr-input" readonly required>
+                </div>
+
+                <div class="form-group full-width">
+    <label class="form-label">Time Slots (1hr each)</label>
+    <div class="time-slots-container" id="timeSlots">
+        <!-- Time slots will be generated here -->
+    </div>
+    <input type="hidden" name="timeSlots" id="timeSlotsHidden">
+</div>
+
+                <div class="form-group full-width" id="priceSummary">
+                    <h3>Price Breakdown</h3>
+                    <div id="priceDetails"></div>
+                    <h3>Total: ₹<span id="totalAmount">0</span></h3>
+                </div>
+
+                <div class="form-group full-width">
+                     <div class="refund-policy">
+                        <input type="checkbox" id="agreePolicy" required>
+                        <label for="agreePolicy">I have read and agree to the <a href="refund-policy.html" style="color: var(--primary);">Refund policy</a>. </label>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-lock"></i> Submit
+                    </button>
+                    <a href="/logout" class="btn btn-logout">
+  <button type="button">
+    <i class="fas fa-lock" aria-hidden="true"></i> Logout
+  </button>
+</a>
+
+<a href="/view_bookings" class="btn btn-bookings">
+  <button type="button">
+    <i class="fas fa-calendar-check" aria-hidden="true"></i> Bookings
+  </button>
+</a>
+                </div>
+                <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <h2>Booking Confirmation</h2>
+        <div id="confirmationMessage"></div>
+        <button onclick="closeModal()" class="modal-close">Close</button>
+    </div>
+</div>
+            </form>
+        </section>
+    </div>
+
+
+
+    {% if existing_booking %}
+  <div class="existing-booking-info">
+    <h3>Booking Conflict</h3>
+    <p><strong>Already booked by:</strong> {{ existing_booking.band_name }}</p>
+    <p><strong>Date:</strong> {{ existing_booking.booking_date }}</p>
+    <p><strong>Time Slot(s):</strong> {{ existing_booking.time_slots }}</p>
+  </div>
+{% endif %}
+
 
     <!-- Footer -->
-    <footer class="footer">
+   <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
                     <div class="footer-logo">
-                        <img src="{{ url_for('static', filename='assets/TMJ final logo.png') }}" alt="The Music Junction Logo">
+                        <img src="/static/assets/img/TMJ.png" alt="The Music Junction Logo">
                         <span>The Music Junction</span>
                     </div>
                     <p class="footer-about">Providing top-quality instrument repair services and premium jamming space
-                        for musicians since 2010.</p>
-                    <div class="footer-social">
-                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                        for musicians since 2018.</p>
+                   <div class="footer-social">
+                        <a href="https://www.facebook.com/share/16S2BqRZJU/" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/themusicjunction.in?igsh=bG5rNzU3dG83Mnpn" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/in/ankit-dubey-3259a35a" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://youtube.com/@tmjthemusicjunction?si=-dnGaDbyeMRx0Iq7" class="social-icon"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
 
@@ -712,6 +526,7 @@
                     <ul class="footer-links">
                         <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
                         <li><a href="{{ url_for('jampad') }}"><i class="fas fa-chevron-right"></i> Jampad</a></li>
+                         <li><a href="{{ url_for('admin') }}"><i class="fas fa-chevron-right"></i> Admin</a></li>
 
 
                         <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact</a></li>
@@ -723,7 +538,7 @@
                     <ul class="footer-links">
                         <li><a href="#"><i class="fas fa-chevron-right"></i> Instrument Repair</a></li>
                         <li><a href="{{ url_for('jampad') }}"><i class="fas fa-chevron-right"></i> Jampad Booking</a></li>
-                        <li><a href="#"><i class="fas fa-chevron-right"></i> Music Lessons</a></li>
+
                         <li><a href="#"><i class="fas fa-chevron-right"></i> Instrument Sales</a></li>
                         <li><a href="#"><i class="fas fa-chevron-right"></i> Equipment Rental</a></li>
                     </ul>
@@ -732,18 +547,18 @@
                 <div class="footer-col">
                     <h3>Contact Info</h3>
                     <ul class="footer-contact">
-                        <li><i class="fas fa-map-marker-alt"></i> 123 Music Street, Melody City</li>
-                        <li><i class="fas fa-phone"></i> +1 (234) 567-890</li>
-                        <li><i class="fas fa-envelope"></i> contact@musicjunction.com</li>
-                        <li><i class="fas fa-clock"></i> Mon-Sat: 10AM - 8PM</li>
+                        <li><i class="fas fa-map-marker-alt"></i>Birbal Rd, Block B, Lajpat Nagar New Delhi 110024</li>
+                        <li><i class="fas fa-phone"></i>  <a href="tel:+918076272529">+91 8076272529</a></li>
+                        <li><i class="fas fa-envelope"></i> <a href="mailto:contact@themusicjunction.com">contact.themusicjunction@gmail.com</a></li>
+                        <li><i class="fas fa-clock"></i> Sun-Sat: 10AM - 8PM</li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
                 <div class="footer-legal">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms and Conditions</a>
+                    <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                    <a href="{{ url_for('terms') }}">Terms and Conditions</a>
                     <a href="{{ url_for('refund') }}">Refund Policy</a>
                 </div>
                 <div class="copyright">
@@ -753,188 +568,168 @@
         </div>
     </footer>
 
-    <!-- Back to Top Button -->
-    <a href="#" class="back-to-top" id="backToTop">
-        <i class="fas fa-arrow-up"></i>
-    </a>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    let bookedSlots = [];
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize flatpickr for date selection
-            const datePicker = flatpickr("#bookingDate", {
-                minDate: "today",
-                dateFormat: "d-m-Y",
-                disable: [
-                    function(date) {
-                        // Disable Sundays
-                        return (date.getDay() === 0);
-                    }
-                ],
-                onChange: function(selectedDates, dateStr, instance) {
-                    updateTimeSlotsAvailability(dateStr);
+    let datePicker = flatpickr("#bookingDate", {
+        minDate: "today",
+        dateFormat: "d-m-Y",
+        onChange: function (selectedDates, dateStr) {
+            if (dateStr) {
+                const parts = dateStr.split("-");
+                const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                generateTimeSlots();
+                setTimeout(() => checkBookedSlots(formattedDate), 10);
+            }
+        }
+    });
+
+    function generateTimeSlots() {
+        const timeSlotsContainer = document.getElementById('timeSlots');
+        timeSlotsContainer.innerHTML = '';
+
+        for (let hour = 8; hour <= 22; hour++) {
+            const startHour = hour.toString().padStart(2, '0');
+            const endHour = (hour + 1).toString().padStart(2, '0');
+            const slotTime = `${startHour}:00-${endHour}:00`;
+
+            const slot = document.createElement('div');
+            slot.className = 'time-slot';
+            slot.setAttribute('data-slot', slotTime);
+
+            slot.innerHTML = `
+                <input type="checkbox" id="slot${hour}" name="slot${hour}" value="${slotTime}" style="display: none;">
+                <label for="slot${hour}" class="time-slot-label">${startHour}:00 - ${endHour}:00</label>
+            `;
+
+            timeSlotsContainer.appendChild(slot);
+        }
+    }
+
+    async function checkBookedSlots(date) {
+        try {
+            const jampad = document.querySelector('input[name="jampad"]:checked').value;
+            console.log(`Fetching slots for ${jampad} on ${date}`);
+
+            const response = await fetch(`/get_booked_slots?date=${date}&jampad=${encodeURIComponent(jampad)}`);
+            if (!response.ok) throw new Error('Failed to fetch booked slots');
+
+            const data = await response.json();
+            bookedSlots = data.booked_slots || [];
+            console.log("Booked slots received:", bookedSlots);
+
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                const slotTime = slot.dataset.slot;
+                const checkbox = slot.querySelector('input');
+                const label = slot.querySelector('label');
+                const isBooked = bookedSlots.includes(slotTime);
+
+                if (isBooked) {
+                    slot.classList.add('booked');
+                    checkbox.disabled = true;
+                    label.style.cursor = 'not-allowed';
+                    label.style.opacity = '0.6';
+                } else {
+                    slot.classList.remove('booked');
+                    checkbox.disabled = false;
+                    label.style.cursor = 'pointer';
+                    label.style.opacity = '1';
                 }
             });
 
-            // Generate time slots (8:00 AM to 11:00 PM)
-            const timeSlotsContainer = document.getElementById('timeSlots');
-            const hours = [];
+        } catch (error) {
+            console.error('Error checking booked slots:', error);
+        }
+    }
 
-            for (let hour = 8; hour <= 23; hour++) {
-                const timeString = `${hour.toString().padStart(2, '0')}:00 - ${(hour + 1).toString().padStart(2, '0')}:00`;
-                hours.push(timeString);
+    // Handle time slot selection
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('time-slot-label')) {
+            const label = e.target;
+            const checkbox = document.getElementById(label.htmlFor);
+
+            if (!checkbox.disabled) {
+                checkbox.checked = !checkbox.checked;
+                if (checkbox.checked) {
+                    label.classList.add('selected');
+                } else {
+                    label.classList.remove('selected');
+                }
+                calculatePrice();
             }
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    });
 
-            hours.forEach(time => {
-                const slotDiv = document.createElement('div');
-                slotDiv.className = 'time-slot';
+    function calculatePrice() {
+        const isTMJ = document.getElementById('tmj').checked;
+        const people = parseInt(document.getElementById('people').value) || 0;
+        const mics = parseInt(document.getElementById('mics').value) || 0;
+        const slots = document.querySelectorAll('input[type="checkbox"][name^="slot"]:checked').length;
 
-                const input = document.createElement('input');
-                input.type = 'checkbox';
-                input.id = `slot-${time.replace(/[: -]/g, '')}`;
-                input.name = 'timeSlots';
-                input.value = time;
+        const maxPeople = isTMJ ? 11 : 15;
+        document.getElementById('people').max = maxPeople;
 
-                const label = document.createElement('label');
-                label.htmlFor = input.id;
-                label.textContent = time;
-                label.setAttribute('aria-label', `Time slot ${time}`);
+        if (people > maxPeople) {
+            alert(`Maximum ${maxPeople} people allowed for this JamPad`);
+            document.getElementById('people').value = maxPeople;
+            return;
+        }
 
-                slotDiv.appendChild(input);
-                slotDiv.appendChild(label);
-                timeSlotsContainer.appendChild(slotDiv);
+        let basePrice = 0;
+        if (isTMJ) {
+            basePrice = slots >= 2 ? 1198 + (slots - 2) * 499 : 599 * slots;
+        } else {
+            basePrice = slots >= 2 ? 820 + (slots - 2) * 360 : 410 * slots;
+        }
+
+        const freePeople = isTMJ ? 9 : 7;
+        const freeMics = 5;
+        const peopleCharge = Math.max(people - freePeople, 0) * 60;
+        const micCharge = Math.max(mics - freeMics, 0) * 60;
+
+        const total = basePrice + peopleCharge + micCharge;
+
+        document.getElementById('priceDetails').innerHTML = `
+            <p>Base Price (${slots} hrs): ₹${basePrice}</p>
+            ${peopleCharge > 0 ? `<p>Extra People: ₹${peopleCharge}</p>` : ''}
+            ${micCharge > 0 ? `<p>Extra Mics: ₹${micCharge}</p>` : ''}
+        `;
+        document.getElementById('totalAmount').textContent = total;
+    }
+
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        const timeSlots = Array.from(document.querySelectorAll('input[type="checkbox"][name^="slot"]:checked'))
+                              .map(checkbox => checkbox.value);
+
+        if (timeSlots.length === 0) {
+            alert("Please select at least one time slot");
+            e.preventDefault();
+            return;
+        }
+
+        document.getElementById('timeSlotsHidden').value = timeSlots.join(',');
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize jampad selection
+        document.querySelectorAll('input[name="jampad"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const date = document.getElementById('bookingDate').value;
+                if (date) {
+                    const parts = date.split("-");
+                    const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    checkBookedSlots(formattedDate);
+                }
+                calculatePrice();
             });
+        });
 
-            // Function to simulate checking booked slots
-            function updateTimeSlotsAvailability(date) {
-                const allSlots = document.querySelectorAll('.time-slot input');
-
-                // Reset all slots
-                allSlots.forEach(slot => {
-                    slot.disabled = false;
-                    slot.nextElementSibling.textContent = slot.value;
-                    slot.nextElementSibling.removeAttribute('aria-label');
-                });
-
-                // For demo purposes, randomly book some slots based on date
-                const dateHash = date.split('-').join('');
-                const randomSeed = parseInt(dateHash) % 100;
-
-                allSlots.forEach((slot, index) => {
-                    // More likely to be booked in evening hours
-                    const eveningFactor = index > 10 ? 0.7 : 0.3;
-
-                    // Combine factors to determine if slot should be booked
-                    if ((randomSeed * eveningFactor * (index + 1)) % 100 < 30) {
-                        slot.disabled = true;
-                        slot.nextElementSibling.textContent = slot.value;
-                        slot.nextElementSibling.setAttribute('aria-label', `${slot.value} - Booked`);
-                    }
-                });
-
-                updatePrice();
-            }
-
-            // Real-time price calculation
-            function updatePrice() {
-                const selectedSlots = document.querySelectorAll('input[name="timeSlots"]:checked');
-                const priceDisplay = document.getElementById('priceDisplay');
-                const totalAmount = selectedSlots.length * 600;
-                priceDisplay.textContent = `Total: ₹${totalAmount}`;
-            }
-
-            // Add event listeners to time slots for price updates
-            document.querySelectorAll('input[name="timeSlots"]').forEach(slot => {
-                slot.addEventListener('change', updatePrice);
-            });
-
-            // Form validation
-            function validateForm() {
-                const formErrors = document.getElementById('formErrors');
-                formErrors.style.display = 'none';
-                formErrors.textContent = '';
-
-                // Validate phone number
-                const phone = document.getElementById('phone').value;
-                if (!/^[0-9]{10}$/.test(phone)) {
-                    showError('Please enter a valid 10-digit phone number');
-                    return false;
-                }
-
-                // Validate at least one time slot selected
-                const selectedSlots = document.querySelectorAll('input[name="timeSlots"]:checked');
-                if (selectedSlots.length === 0) {
-                    showError('Please select at least one time slot');
-                    return false;
-                }
-
-                // Validate policy agreement
-                if (!document.getElementById('agreePolicy').checked) {
-                    showError('You must agree to the refund policy');
-                    return false;
-                }
-
-                return true;
-            }
-
-            function showError(message) {
-                const formErrors = document.getElementById('formErrors');
-                formErrors.textContent = message;
-                formErrors.style.display = 'block';
-
-                // Scroll to error message
-                formErrors.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-
-            // Form submission
-            const bookingForm = document.getElementById('bookingForm');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const submitBtn = document.getElementById('submitBtn');
-            const confirmationModal = document.getElementById('confirmationModal');
-            const modalClose = document.getElementById('modalClose');
-            const modalOkBtn = document.getElementById('modalOkBtn');
-            const confirmationMessage = document.getElementById('confirmationMessage');
-
-            bookingForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                if (!validateForm()) {
-                    return false;
-                }
-
-                // Show loading spinner
-                loadingSpinner.style.display = 'block';
-                submitBtn.disabled = true;
-
-                // Simulate form processing
-                setTimeout(() => {
-                    loadingSpinner.style.display = 'none';
-
-                    // Get form data
-                    const bandName = document.getElementById('bandName').value;
-                    const email = document.getElementById('email').value;
-                    const selectedDate = datePicker.selectedDates[0];
-                    const selectedSlots = Array.from(document.querySelectorAll('input[name="timeSlots"]:checked')).map(slot => slot.value);
-
-                    // Create confirmation message
-                    const formattedDate = selectedDate.toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-
-                    const totalHours = selectedSlots.length;
-                    const totalAmount = totalHours * 600; // ₹600 per hour
-
-                    confirmationMessage.innerHTML = `
-                        Thank you, ${bandName}!<br><br>
-                        Your jam session is booked for:<br>
-                        <strong>${formattedDate}</strong><br>
-                        Time: <strong>${selectedSlots.join(', ')}</strong><br><br>
-                        Total: ₹${totalAmount} for ${totalHours} hour${totalHours > 1 ? 's' : ''}<br><br>
-    </script>
+        // Initial load
+        generateTimeSlots();
+    });
+</script>
+</body>
+</html>

@@ -326,11 +326,15 @@ img {
     position: relative;
     height: 100vh;
     min-height: 700px;
-
+    background-image: url('/static/assets/img/rajanbhaiya.jpeg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
     display: flex;
     align-items: center;
     color: var(--white);
     margin-top: 80px;
+
 }
 
 .hero-overlay {
@@ -520,12 +524,16 @@ img {
     border-radius: var(--border-radius);
     overflow: hidden;
     box-shadow: var(--box-shadow);
+     width: 450px;   /* Set width to 400 pixels */
+    height: auto;
+
 }
 
 .about-image img {
     transition: var(--transition);
     width: 100%;
     height: auto;
+    display: block;
 }
 
 .about-image:hover img {
@@ -658,38 +666,6 @@ img {
     transition: var(--transition);
 }
 
-.gallery-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(106, 27, 154, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    transition: var(--transition);
-}
-
-.gallery-expand {
-    color: var(--white);
-    font-size: 2rem;
-    transition: var(--transition);
-    transform: scale(0.8);
-}
-
-.gallery-item:hover .gallery-overlay {
-    opacity: 1;
-}
-
-.gallery-item:hover .gallery-expand {
-    transform: scale(1);
-}
-
-.gallery-item:hover img {
-    transform: scale(1.1);
-}
 
 
 
@@ -723,7 +699,7 @@ img {
 .footer {
     margin-top: auto; /* Pushes footer to the bottom */
      /* Optional: Padding for the footer */
-    background: var(--dark-color);
+    background: #212121;
     color: var(--white);
     padding: 60px 0 0;
 }
