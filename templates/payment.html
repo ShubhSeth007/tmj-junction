@@ -3,20 +3,75 @@
 <head>
     <title>Complete Payment</title>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .payment-container { max-width: 500px; margin: 0 auto; }
-        .booking-details { background: #f8f9fa; padding: 15px; border-radius: 5px; }
+   <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+
+        .payment-container {
+            max-width: 550px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2d3436;
+        }
+
+        .booking-details {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .booking-details p {
+            margin: 8px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border: 1px solid #ffeeba;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #rzp-button {
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 25px;
+            width: 100%;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
     <div class="payment-container">
-        <h2>Complete Your Payment</h2>
+        <h2>Confirm details and Proceed payment</h2>
 
         <div class="booking-details">
             <p><strong>JamPad:</strong> {{ booking.jampad_name }}</p>
             <p><strong>Date:</strong> {{ booking.booking_date }}</p>
             <p><strong>Time Slots:</strong> {{ booking.time_slots }}</p>
+            <p><strong>Phone:</strong> {{ booking.phone }}</p>
+            <p><strong>Email:</strong> {{ booking.email }}</p>
+            <p><strong>No of persons:</strong> {{ booking.no_of_people }}</p>
+            <p><strong>Microphones:</strong> {{ booking.microphones }}</p>
             <p><strong>Amount:</strong> ₹{{ (amount)|round(2) }}</p>
         </div>
         <div class="warning" style="color: red; font-weight: bold; margin-top: 15px;">
