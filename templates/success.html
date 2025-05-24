@@ -193,7 +193,9 @@
 </head>
 <body>
     <div class="container">
+
         <div class="success-message">
+            <img src="{{ url_for('static', filename='/static/assets/img/TMJ.png') }}" alt="Booking Success" style="max-width: 120px; margin: 0 auto 20px; display: block;">
             <!-- Confirmation Header -->
             <div class="confirmation-header">
                 <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
@@ -220,14 +222,21 @@
                     <span class="detail-value">{{ booking.time_slots }}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">booking_date #:</span>
-                    <span class="detail-value">{{ booking.booking_date }}</span>
+                    <span class="detail-label">Person count:</span>
+                    <span class="detail-value">{{ booking.no_of_people }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Microphones:</span>
+                    <span class="detail-value">{{ booking.microphones }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Confirmation #:</span>
                     <span class="detail-value">{{ booking.payment_id }}</span>
                 </div>
-
+                <div class="detail-row">
+                    <span class="detail-label">booking_date #:</span>
+                    <span class="detail-value">{{ booking.booking_date }}</span>
+                </div>
 
             </div>
 

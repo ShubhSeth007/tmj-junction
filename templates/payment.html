@@ -62,18 +62,48 @@
 </head>
 <body>
     <div class="payment-container">
-        <h2>Confirm details and Proceed payment</h2>
+        <h2>Confirm your details and Proceed payment</h2>
 
         <div class="booking-details">
-            <p><strong>JamPad:</strong> {{ booking.jampad_name }}</p>
-            <p><strong>Date:</strong> {{ booking.booking_date }}</p>
-            <p><strong>Time Slots:</strong> {{ booking.time_slots }}</p>
-            <p><strong>Phone:</strong> {{ booking.phone }}</p>
-            <p><strong>Email:</strong> {{ booking.email }}</p>
-            <p><strong>No of persons:</strong> {{ booking.no_of_people }}</p>
-            <p><strong>Microphones:</strong> {{ booking.microphones }}</p>
-            <p><strong>Amount:</strong> ₹{{ (amount)|round(2) }}</p>
-        </div>
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">JamPad:</td>
+            <td style="padding: 8px;">{{ booking.jampad_name }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Band Name:</td>
+            <td style="padding: 8px;">{{ booking.band_name }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Date:</td>
+            <td style="padding: 8px;">{{ booking.booking_date }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Time Slots:</td>
+            <td style="padding: 8px;">{{ booking.time_slots }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Phone:</td>
+            <td style="padding: 8px;">{{ booking.phone }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Email:</td>
+            <td style="padding: 8px;">{{ booking.email }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">No of persons:</td>
+            <td style="padding: 8px;">{{ booking.no_of_people }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Microphones:</td>
+            <td style="padding: 8px;">{{ booking.microphones }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Amount:</td>
+            <td style="padding: 8px;">₹{{ (amount)|round(2) }}</td>
+        </tr>
+    </table>
+</div>
         <div class="warning" style="color: red; font-weight: bold; margin-top: 15px;">
         ⚠️ Please do not refresh or close the page during payment.
     </div>

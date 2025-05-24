@@ -451,6 +451,8 @@ def payment_success():
                 'booking_date': booking.booking_date,
                 'time_slots': booking.time_slots,
                 'payment_id': booking.payment_id,
+                'band_name': booking.band_name,
+                'microphones': booking.microphones,
                 'band_name': booking.band_name
             }
 
