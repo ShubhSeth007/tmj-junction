@@ -382,8 +382,7 @@ def payment_success():
 
     payment_id = request.args.get('payment_id')
     order_id = request.args.get('order_id')
-    amount = request.args.get('amount')  # ₹599 in paise
-    amount = int(amount)
+
 
     try:
         # Verify payment with Razorpay
@@ -428,7 +427,7 @@ def payment_success():
                         body=f"Your booking for {booking_data['jampad_name']} is confirmed!\n"
                              f"Date: {booking_data['booking_date']}\n"
                              f"Time: {booking_data['time_slots']}\n"
-                             f"Amount: {amount}\n"
+                             
                              f"Payment ID: {order_id}"
                     )
 
@@ -440,7 +439,7 @@ def payment_success():
                              f" band name {booking_data['band_name']}"
                              f"Date: {booking_data['booking_date']}\n"
                              f"Time: {booking_data['time_slots']}\n"
-                             f"Amount: {amount}\n"
+                             
                              f"Payment ID: {order_id}"
                     )
                 except Exception as e:
