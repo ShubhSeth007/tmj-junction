@@ -66,7 +66,7 @@ class bookin(db.Model):
     email = db.Column(db.String(50), nullable=False)
     phone = db.Column(db.String(20), nullable=False)
     no_of_people = db.Column(db.String(5), nullable=False)
-    microphones = db.Column(db.String(5), nullable=True)
+    microphones = db.Column(db.String(5), nullable=False)
     booking_date = db.Column(db.String(10), nullable=False)
     time_slots = db.Column(db.String(200), nullable=False)
     date = db.Column(db.String(12), nullable=True)
@@ -156,10 +156,6 @@ def jampad():
             phone = request.form.get('phone')
             no_of_people = request.form.get('people')
             microphones = request.form.get('mics')
-            if microphones:
-                microphones = int(microphones)
-            else:
-                microphones = 0
             time_slots = request.form.get('timeSlots', '')
             booking_date_str = request.form.get('bookingDate')
 
