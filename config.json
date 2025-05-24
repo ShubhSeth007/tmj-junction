@@ -9,7 +9,8 @@
     "folder_location": "C:\\Users\\shubh seth\\PycharmProjects\\objectdetection\\pythonProject\\venv\\dhrr",
     "gmail-user": "bookings.themusicjunction@gmail.com" ,
     "gmail-password": "rwbe qgpj hvlj sgpm",
-    "client_id": "TEST-M23K08WXKG7RY_25051",
-    "client_secret": "YWZkNjk4MTUtYzBmYS00M2YyLWEwYjEtOTEyMzU1MDAxY2Jl"
+    "razorpay_key_id": "rzp_live_H7pds9dSMO6ffD",
+    "razorpay_key_secret": "vCGq7Tf8h3WApIn7QHbky3xN",
+    "razorpay_webhook_secret": "your_webhook_secret"
   }
 }

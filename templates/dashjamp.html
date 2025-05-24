@@ -410,7 +410,18 @@
                         </div>
                     </div>
                 </div>
+<div class="form-group">
+                    <label for="bookingDate" class="form-label">Date</label>
+                    <input type="text" name="bookingDate" id="bookingDate" class="form-control flatpickr-input" readonly required>
+                </div>
 
+                <div class="form-group full-width">
+    <label class="form-label">Time Slots (1hr each)</label>
+    <div class="time-slots-container" id="timeSlots">
+        <!-- Time slots will be generated here -->
+    </div>
+    <input type="hidden" name="timeSlots" id="timeSlotsHidden">
+</div>
                 <div class="form-group">
                     <label for="bandName" class="form-label">Band Name</label>
                     <input type="text" name="bandName" id="bandName" class="form-control" required placeholder="Enter your Band Name">
@@ -440,18 +451,7 @@
                            min="1" required onchange="calculatePrice()" PLACEHOLDER="5 Microphones are free for both jampads">
                 </div>
 
-                <div class="form-group">
-                    <label for="bookingDate" class="form-label">Date</label>
-                    <input type="text" name="bookingDate" id="bookingDate" class="form-control flatpickr-input" readonly required>
-                </div>
 
-                <div class="form-group full-width">
-    <label class="form-label">Time Slots (1hr each)</label>
-    <div class="time-slots-container" id="timeSlots">
-        <!-- Time slots will be generated here -->
-    </div>
-    <input type="hidden" name="timeSlots" id="timeSlotsHidden">
-</div>
 
                 <div class="form-group full-width" id="priceSummary">
                     <h3>Price Breakdown</h3>

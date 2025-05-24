@@ -5,12 +5,12 @@ import json
 from werkzeug.utils import secure_filename
 from sqlalchemy import text
 from datetime import datetime
+import razorpay
 
 import os
 import math
 
 # Load configuration
-params = {}
 try:
     with open('config.json', 'r') as c:
         params = json.load(c)["params"]
@@ -19,7 +19,8 @@ except (FileNotFoundError, KeyError) as e:
     params = {}  # Ensure params exists even if config fails
 
 # Boolean check for local server
-local_server = False
+local_server = False  # Set to True for local testing
+
 
 app = Flask(__name__)
 app.secret_key = params.get('secret_key', 'super-secret-key')  # Get from config if available
@@ -42,6 +43,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = params.get('local_uri' if local_server e
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
+# Initialize Razorpay client with test credentials
+razorpay_client = razorpay.Client(auth=(params.get('razorpay_key_id'), params.get('razorpay_key_secret')))
+
 
 class Contacts(db.Model):
     __tablename__ = 'shubhjamp'
@@ -63,9 +67,12 @@ class bookin(db.Model):
     phone = db.Column(db.String(20), nullable=False)
     no_of_people = db.Column(db.String(5), nullable=False)
     microphones = db.Column(db.String(5), nullable=False)
-    booking_date = db.Column(db.String(10), nullable=False)  # Stored as string
+    booking_date = db.Column(db.String(10), nullable=False)
     time_slots = db.Column(db.String(200), nullable=False)
     date = db.Column(db.String(12), nullable=True)
+    payment_id = db.Column(db.String(100), nullable=True)
+    payment_status = db.Column(db.String(20), nullable=False, default='pending')
+    is_admin_booking = db.Column(db.Boolean, default=False)
 
 
 # Create tables
@@ -137,6 +144,7 @@ def dashjamp():
 
 
 # In your jampad route (most critical fixes):
+# In your jampad route (most critical fixes):
 @app.route("/jampad", methods=['GET', 'POST'])
 def jampad():
     if request.method == 'POST':
@@ -148,7 +156,7 @@ def jampad():
             phone = request.form.get('phone')
             no_of_people = request.form.get('people')
             microphones = request.form.get('mics')
-            time_slots = request.form.get('timeSlots', '')  # comma-separated string
+            time_slots = request.form.get('timeSlots', '')
             booking_date_str = request.form.get('bookingDate')
 
             # Validate required fields
@@ -156,63 +164,87 @@ def jampad():
                 flash('Please fill all required fields', 'error')
                 return redirect(url_for('jampad'))
 
-            # Convert date format from dd-mm-yyyy to yyyy-mm-dd
+            # Convert date format
             try:
                 booking_date_obj = datetime.strptime(booking_date_str, '%d-%m-%Y')
-                date_str = booking_date_obj.strftime('%Y-%m-%d')
+                db_date_str = booking_date_obj.strftime('%Y-%m-%d')
             except ValueError:
                 flash('Invalid date format. Use DD-MM-YYYY', 'error')
                 return redirect(url_for('jampad'))
 
-            # Check if exact slot already booked
+            # Check slot availability
             existing = bookin.query.filter_by(
-                booking_date=date_str,
+                booking_date=db_date_str,
                 jampad_name=jampad_name
             ).all()
+
             for booking in existing:
                 existing_slots = set(booking.time_slots.split(','))
-
                 new_slots = set(time_slots.split(','))
-                if existing_slots & new_slots:  # if there is any overlap
-                    print("Matched Existing:", booking)
-                    flash('One or more selected time slots are already booked!', 'error')
+                if existing_slots & new_slots:
+                    flash('Time slots already booked!', 'error')
                     return render_template('newjampad (1).html', params=params, existing_booking=booking)
 
-            # Create new booking
-            new_booking = bookin(
-                jampad_name=jampad_name,
-                band_name=band_name,
-                email=email,
-                phone=phone,
-                no_of_people=no_of_people,
-                microphones=microphones,
-                booking_date=date_str,
-                time_slots=time_slots,
-                date=datetime.now().strftime('%Y-%m-%d')
-            )
+            # Store in session
+            session['pending_booking'] = {
+                'jampad_name': jampad_name,
+                'band_name': band_name,
+                'email': email,
+                'phone': phone,
+                'no_of_people': no_of_people,
+                'microphones': microphones,
+                'booking_date': db_date_str,
+                'time_slots': time_slots
+            }
+            amount = request.form.get('amount')
+            print(amount)
 
-            db.session.add(new_booking)
-            db.session.commit()
-            if params:
-                mail.send_message(
-                    'New message from ' + jampad_name,
-                    sender=email,
-                    recipients=[params.get('gmail-user')],
-                    body= "jampad:" + jampad_name + "\n" + "phone:" + phone + "\n" + "time_slots:" + time_slots + "\n" + "band_name:" + band_name
-                )
+
             if "user" in session and session['user'] == params.get('admin_user'):
-                flash('Booking recorded without payment (Admin Mode)', 'info')
-                return redirect(url_for('dashjamp'))
-            return redirect(url_for('pay', booking_id=new_booking.sno))
+                # Handle admin booking
+                return save_admin_booking()
+            else:
+                if not amount:
+                  flash('Error: Amount missing!', 'error')
+                  return redirect(url_for('jampad'))
+
+                try:
+                     amount = int(amount)
+                except ValueError:
+                   flash('Invalid amount value', 'error')
+                   return redirect(url_for('jampad'))
+                # Redirect to payment
+                return redirect(url_for('initiate_payment',amount=amount))
 
         except Exception as e:
             db.session.rollback()
             flash(f'Error: {str(e)}', 'error')
-            app.logger.error(f"Booking error: {str(e)}")
             return redirect(url_for('jampad'))
 
-    # GET request
     return render_template('newjampad (1).html', params=params)
+
+
+def save_admin_booking():
+    """Save admin booking directly"""
+    booking_data = session['pending_booking']
+    booking = bookin(
+        jampad_name=booking_data['jampad_name'],
+        band_name=booking_data['band_name'],
+        email=booking_data['email'],
+        phone=booking_data['phone'],
+        no_of_people=booking_data['no_of_people'],
+        microphones=booking_data['microphones'],
+        booking_date=booking_data['booking_date'],
+        time_slots=booking_data['time_slots'],
+        date=datetime.now().strftime('%Y-%m-%d'),
+        payment_status='admin_booking',
+        is_admin_booking=True
+    )
+
+    db.session.add(booking)
+    db.session.commit()
+    flash('Admin booking created!', 'success')
+    return redirect(url_for('dashjamp'))
 
 
 @app.route('/view_bookings', methods=['GET'])
@@ -303,6 +335,137 @@ def get_booked_slots():
         print(f"Error fetching booked slots: {e}")
         return jsonify({"error": str(e)}), 500
 
+@app.route("/initiate-payment")
+def initiate_payment():
+    if 'pending_booking' not in session:
+        flash('Session expired. Please start over.', 'error')
+        return redirect(url_for('jampad'))
+
+    booking = session['pending_booking']
+    amount = request.args.get('amount')# ₹599 in paise
+    amount=int(amount)
+    print(f"the amount is {amount}")
+
+    try:
+        # Create Razorpay order
+        order = razorpay_client.order.create({
+            'amount': amount * 100,
+            'currency': 'INR',
+            'payment_capture': '1',
+            'notes': {
+                'booking_for': f"{booking['jampad_name']} - {booking['time_slots']}"
+            }
+        })
+
+        return render_template('payment.html',
+                               razorpay_key_id=params['razorpay_key_id'],
+                               order_id=order['id'],
+                               amount=amount,
+                               name=booking['band_name'],
+                               email=booking['email'],
+                               contact=booking['phone'],
+                               booking=booking,
+
+                               params=params
+                               )
+
+    except Exception as e:
+        flash(f'Payment error: {str(e)}', 'error')
+        return redirect(url_for('jampad'))
+
+
+@app.route("/payment/success")
+def payment_success():
+    if 'pending_booking' not in session:
+        flash('Session expired. Please start over.', 'error')
+        return redirect(url_for('jampad'))
+
+    payment_id = request.args.get('payment_id')
+    order_id = request.args.get('order_id')
+    amount = request.args.get('amount')  # ₹599 in paise
+    amount = int(amount)
+
+    try:
+        # Verify payment with Razorpay
+        payment = razorpay_client.payment.fetch(payment_id)
+
+        if payment['status'] == 'captured':
+            # Save to database
+            booking_data = session['pending_booking']
+            booking = bookin(  # Make sure this matches your model name
+                jampad_name=booking_data['jampad_name'],
+                band_name=booking_data['band_name'],
+                email=booking_data['email'],
+                phone=booking_data['phone'],
+                no_of_people=booking_data['no_of_people'],
+                microphones=booking_data['microphones'],
+                booking_date=booking_data['booking_date'],
+                time_slots=booking_data['time_slots'],
+                date=datetime.now().strftime('%Y-%m-%d'),
+                payment_id=order_id,
+                payment_status='completed'
+            )
+
+            db.session.add(booking)
+            db.session.commit()
+
+            # Create booking details for template
+            booking_details = {
+                'jampad_name': booking.jampad_name,
+                'booking_date': booking.booking_date,
+                'time_slots': booking.time_slots,
+                'payment_id': booking.payment_id,
+                'band_name': booking.band_name
+            }
+
+            # Send confirmation email
+            if 'gmail-user' in params and params['gmail-user']:
+                try:
+                    mail.send_message(
+                        'Booking Confirmation',
+                        sender=params['gmail-user'],
+                        recipients=[booking_data['email']],
+                        body=f"Your booking for {booking_data['jampad_name']} is confirmed!\n"
+                             f"Date: {booking_data['booking_date']}\n"
+                             f"Time: {booking_data['time_slots']}\n"
+                             f"Amount: {amount}\n"
+                             f"Payment ID: {order_id}"
+                    )
+
+                    mail.send_message(
+                        'Booking Confirmation',
+                        sender=params['gmail-user'],
+                        recipients=params['gmail-user'],
+                        body=f" booking for {booking_data['jampad_name']} is confirmed!\n"
+                             f" band name {booking_data['band_name']}"
+                             f"Date: {booking_data['booking_date']}\n"
+                             f"Time: {booking_data['time_slots']}\n"
+                             f"Amount: {amount}\n"
+                             f"Payment ID: {order_id}"
+                    )
+                except Exception as e:
+                    print(f"Email sending failed: {str(e)}")
+
+            # Clear session
+            session.pop('pending_booking', None)
+
+            # Debug print
+            print("Rendering success.html with booking:", booking_details)
+
+            # Render the template directly
+            return render_template('success.html',
+                                   booking=booking_details)
+
+        else:
+            flash('Payment verification failed', 'error')
+            return redirect(url_for('jampad'))
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Payment processing error: {str(e)}")  # Debug print
+        flash(f'Payment processing error: {str(e)}', 'error')
+        return redirect(url_for('jampad'))
+
 
 @app.route("/refund")
 def refund():
@@ -365,90 +528,6 @@ def test_db():
 # ---------------- PHONEPE INTEGRATION ----------------
 # ---------------- DEFAULT PHONEPE TEST INTEGRATION ----------------
 
-
-import base64, hmac, hashlib, json, requests
-from flask import redirect, url_for, flash
-
-client_id = params.get("client_id")
-client_secret = params.get("client_secret")
-
-
-def get_phonepe_access_token(client_id, client_secret):
-    token_url = "https://api-preprod.phonepe.com/apis/hermes/pg/v1/token"
-
-    headers = {
-        "Content-Type": "application/x-www-form-urlencoded"
-    }
-
-    data = {
-        "grant_type": "client_credentials",
-        "client_id": client_id,
-        "client_secret": client_secret
-    }
-
-    response = requests.post(token_url, headers=headers, data=data)
-    if response.status_code == 200:
-        return response.json().get("access_token")
-    else:
-        print("Error getting access token:", response.text)
-        return None
-
-@app.route("/pay/<int:booking_id>")
-def pay(booking_id):
-    booking = bookin.query.get_or_404(booking_id)
-    amount = 59900  # ₹599 in paise
-
-    access_token = get_phonepe_access_token(client_id, client_secret)
-    if not access_token:
-        flash("Payment initialization failed (token error)", "error")
-        return redirect(url_for("jampad"))
-
-    transaction_id = f"TXN{booking_id}{int(datetime.now().timestamp())}"
-
-    payload = {
-        "merchantId": client_id,
-        "transactionId": transaction_id,
-        "merchantUserId": booking.email,
-        "amount": amount,
-        "redirectUrl": url_for("payment_success", _external=True),
-        "redirectMode": "POST",
-        "callbackUrl": url_for("payment_callback", _external=True),
-        "mobileNumber": booking.phone,
-        "paymentInstrument": {
-            "type": "PAY_PAGE"
-        }
-    }
-
-    url = "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay"
-
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {access_token}"
-    }
-
-    response = requests.post(url, headers=headers, json=payload)
-    res_json = response.json()
-    print("PhonePe response:", res_json)
-
-    if res_json.get("success"):
-        redirect_url = res_json["data"]["instrumentResponse"]["redirectInfo"]["url"]
-        return redirect(redirect_url)
-    else:
-        flash("Payment failed: " + res_json.get("message", "Unknown error"), "error")
-        return redirect(url_for("jampad"))
-
-
-
-
-@app.route("/payment_success", methods=["POST"])
-def payment_success():
-    return "✅ Payment successful! (Test Key Response)"
-
-@app.route("/payment_callback", methods=["POST"])
-def payment_callback():
-    data = request.get_json()
-    print("PhonePe callback (test):", data)
-    return "OK", 200
 
 
 

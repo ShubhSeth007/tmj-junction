@@ -76,7 +76,7 @@
             margin: 2rem auto;
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
             border-radius: 0.5rem;
-            overflow: hidden;
+            overflow: horizontal;
             width: 98%;
         }
 
@@ -301,6 +301,7 @@
                                     <th scope="col">Date</th>
                                     <th scope="col">Phone</th>
                                     <th scope="col">Email</th>
+                                    <th scope="col">Payment id</th>
                                     <th scope="col">Actions</th>
                                 </tr>
                             </thead>
@@ -321,6 +322,7 @@
                                             <div class="text-ellipsis" title="Click to view full email">{{booking.email}}</div>
                                             <div class="email-full">{{booking.email}}</div>
                                         </td>
+                                        <td>{{booking.payment_id}}</td>
                                         <td>
                                          <form action="{{ url_for('delete_booking', booking_id=booking.sno) }}" method="POST">
                                            <button type="submit" class="btn btn-danger btn-sm">

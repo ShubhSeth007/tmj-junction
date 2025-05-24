@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .payment-container { max-width: 500px; margin: 0 auto; }
+        .booking-details { background: #f8f9fa; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <h2>Complete Your Payment</h2>
+
+        <div class="booking-details">
+            <p><strong>JamPad:</strong> {{ booking.jampad_name }}</p>
+            <p><strong>Date:</strong> {{ booking.booking_date }}</p>
+            <p><strong>Time Slots:</strong> {{ booking.time_slots }}</p>
+            <p><strong>Amount:</strong> ₹{{ (amount)|round(2) }}</p>
+        </div>
+
+        <button id="rzp-button" style="
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        ">Pay Now</button>
+    </div>
+
+    <script>
+    var options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ amount }}",
+        "currency": "INR",
+        "name": "The Music Junction",
+        "description": "JamPad Booking",
+        "order_id": "{{ order_id }}",
+        "handler": function(response) {
+            window.location.href = `/payment/success?payment_id=${response.razorpay_payment_id}&order_id=${response.razorpay_order_id}`;
+        },
+        "prefill": {
+            "name": "{{ name }}",
+            "email": "{{ email }}",
+            "contact": "{{ contact }}"
+        },
+        "theme": {
+            "color": "#6c5ce7"
+        }
+    };
+
+    var rzp = new Razorpay(options);
+
+    document.getElementById('rzp-button').onclick = function(e) {
+        rzp.open();
+        e.preventDefault();
+    }
+
+    // Auto-open payment modal
+    window.onload = function() {
+        rzp.open();
+    }
+    </script>
+</body>
+</html>

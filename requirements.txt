@@ -5,3 +5,5 @@ requests
 Werkzeug
 gunicorn
 pymysql
+razorpay
+psycopg2-binary
