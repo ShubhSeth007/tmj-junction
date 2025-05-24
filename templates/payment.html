@@ -40,7 +40,8 @@
         "description": "JamPad Booking",
         "order_id": "{{ order_id }}",
         "handler": function(response) {
-            window.location.href = `/payment/success?payment_id=${response.razorpay_payment_id}&order_id=${response.razorpay_order_id}`;
+            window.location.href = "{{ url_for('payment_success', _external=True) }}?payment_id=" + response.razorpay_payment_id + "&order_id=" + response.razorpay_order_id;
+;
         },
         "prefill": {
             "name": "{{ name }}",
