@@ -243,8 +243,45 @@ def save_admin_booking():
 
     db.session.add(booking)
     db.session.commit()
+
+    # Email sending logic
+    if 'gmail-user' in params and params['gmail-user']:
+        try:
+            # Email to user
+            mail.send_message(
+                'Admin Booking Confirmation',
+                sender=params['gmail-user'],
+                recipients=[booking_data['email']],
+                body=f"""Your JamPad booking has been created by admin.
+
+JamPad: {booking_data['jampad_name']}
+Date: {booking_data['booking_date']}
+Time Slot: {booking_data['time_slots']}
+Band Name: {booking_data['band_name']}
+Status: Admin Booking
+"""
+            )
+
+            # Email to admin
+            mail.send_message(
+                'New Admin Booking',
+                sender=params['gmail-user'],
+                recipients=[params['gmail-user']],
+                body=f"""A new admin booking has been created.
+
+JamPad: {booking_data['jampad_name']}
+Band Name: {booking_data['band_name']}
+Date: {booking_data['booking_date']}
+Time Slot: {booking_data['time_slots']}
+Status: Admin Booking
+"""
+            )
+        except Exception as e:
+            print(f"Email sending failed: {str(e)}")
+
     flash('Admin booking created!', 'success')
     return redirect(url_for('dashjamp'))
+
 
 
 @app.route('/view_bookings', methods=['GET'])
