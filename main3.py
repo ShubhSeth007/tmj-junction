@@ -420,27 +420,33 @@ def payment_success():
             # Send confirmation email
             if 'gmail-user' in params and params['gmail-user']:
                 try:
+                    # Email to user
                     mail.send_message(
                         'Booking Confirmation',
                         sender=params['gmail-user'],
                         recipients=[booking_data['email']],
-                        body=f"Your booking for {booking_data['jampad_name']} is confirmed!\n"
-                             f"Date: {booking_data['booking_date']}\n"
-                             f"Time: {booking_data['time_slots']}\n"
-                             
-                             f"Payment ID: {order_id}"
+                        body=f"""Your booking for {booking_data['jampad_name']} is confirmed!
+
+            Date: {booking_data['booking_date']}
+            Time: {booking_data['time_slots']}
+            Band Name: {booking_data['band_name']}
+            Payment ID: {order_id}
+            """
                     )
 
+                    # Email to admin
                     mail.send_message(
-                        'Booking Confirmation',
+                        'New Booking Received',
                         sender=params['gmail-user'],
-                        recipients=params['gmail-user'],
-                        body=f" booking for {booking_data['jampad_name']} is confirmed!\n"
-                             f" band name {booking_data['band_name']}"
-                             f"Date: {booking_data['booking_date']}\n"
-                             f"Time: {booking_data['time_slots']}\n"
-                             
-                             f"Payment ID: {order_id}"
+                        recipients=[params['gmail-user']],
+                        body=f"""A new booking has been made.
+
+            JamPad: {booking_data['jampad_name']}
+            Band Name: {booking_data['band_name']}
+            Date: {booking_data['booking_date']}
+            Time: {booking_data['time_slots']}
+            Payment ID: {order_id}
+            """
                     )
                 except Exception as e:
                     print(f"Email sending failed: {str(e)}")
