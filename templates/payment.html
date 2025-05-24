@@ -19,7 +19,9 @@
             <p><strong>Time Slots:</strong> {{ booking.time_slots }}</p>
             <p><strong>Amount:</strong> ₹{{ (amount)|round(2) }}</p>
         </div>
-
+        <div class="warning" style="color: red; font-weight: bold; margin-top: 15px;">
+        ⚠️ Please do not refresh or close the page during payment.
+    </div>
         <button id="rzp-button" style="
             background: #6c5ce7;
             color: white;
