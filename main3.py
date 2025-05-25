@@ -453,7 +453,8 @@ def payment_success():
                 'payment_id': booking.payment_id,
                 'band_name': booking.band_name,
                 'microphones': booking.microphones,
-                'band_name': booking.band_name
+                'band_name': booking.band_name,
+                'no_of_people': booking.no_of_people
             }
 
             # Send confirmation email
