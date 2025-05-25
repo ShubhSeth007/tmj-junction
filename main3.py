@@ -26,6 +26,12 @@ app = Flask(__name__)
 app.secret_key = params.get('secret_key', 'super-secret-key')  # Get from config if available
 app.config['UPLOAD_FOLDER'] = params.get("folder_location", "uploads")
 
+app.config.update(
+    SESSION_COOKIE_SECURE=True,        # Ensures cookie is sent only over HTTPS
+    SESSION_COOKIE_SAMESITE='Lax',     # Helps with cross-site compatibility (e.g., redirects)
+    SESSION_COOKIE_HTTPONLY=True,      # Prevents JS access — safe default
+)
+
 # Initialize Mail if configured
 mail = Mail(app)
 if params.get('gmail-user') and params.get('gmail-password'):
@@ -196,6 +202,7 @@ def jampad():
                 'booking_date': db_date_str,
                 'time_slots': time_slots
             }
+            session.modified = True
             amount = request.form.get('amount')
             print(amount)
 
