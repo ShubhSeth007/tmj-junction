@@ -448,7 +448,7 @@
                 <div class="form-group">
                     <label for="mics" class="form-label">Microphones</label>
                     <input type="number" name="mics" id="mics" class="form-control"
-                           min="1" required onchange="calculatePrice()" PLACEHOLDER="5 Microphones are free for both jampads">
+                           min="0" required onchange="calculatePrice()" PLACEHOLDER="5 Microphones are free for both jampads">
                 </div>
 
 
@@ -457,6 +457,8 @@
                     <h3>Price Breakdown</h3>
                     <div id="priceDetails"></div>
                     <h3>Total: ₹<span id="totalAmount">0</span></h3>
+                    <input type="hidden" name="amount" id="amount">
+
                 </div>
 
                 <div class="form-group full-width">
@@ -689,6 +691,7 @@
             ${micCharge > 0 ? `<p>Extra Mics: ₹${micCharge}</p>` : ''}
         `;
         document.getElementById('totalAmount').textContent = total;
+        document.getElementById('amount').value = total;
     }
 
     document.getElementById('bookingForm').addEventListener('submit', function(e) {

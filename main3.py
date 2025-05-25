@@ -153,6 +153,7 @@ def dashjamp():
 # In your jampad route (most critical fixes):
 @app.route("/jampad", methods=['GET', 'POST'])
 def jampad():
+
     if request.method == 'POST':
         try:
             # Get form fields
@@ -164,9 +165,12 @@ def jampad():
             microphones = request.form.get('mics')
             time_slots = request.form.get('timeSlots', '')
             booking_date_str = request.form.get('bookingDate')
+            amount = request.form.get('amount')  # Get amount from form
 
             # Validate required fields
-            if not all([jampad_name, band_name, email, phone, no_of_people, microphones, time_slots, booking_date_str]):
+            if not all([jampad_name, band_name, email, phone, no_of_people, microphones, time_slots, booking_date_str,
+                        amount]):
+
                 flash('Please fill all required fields', 'error')
                 return redirect(url_for('jampad'))
 
@@ -200,28 +204,24 @@ def jampad():
                 'no_of_people': no_of_people,
                 'microphones': microphones,
                 'booking_date': db_date_str,
-                'time_slots': time_slots
+                'time_slots': time_slots,
+                'amount': amount
             }
             session.modified = True
-            amount = request.form.get('amount')
-            print(amount)
-
+            print(f"Session stored: {session.get('pending_booking')}")
 
             if "user" in session and session['user'] == params.get('admin_user'):
                 # Handle admin booking
                 return save_admin_booking()
             else:
-                if not amount:
-                  flash('Error: Amount missing!', 'error')
-                  return redirect(url_for('jampad'))
-
                 try:
-                     amount = int(amount)
+                    amount = int(amount)
                 except ValueError:
-                   flash('Invalid amount value', 'error')
-                   return redirect(url_for('jampad'))
-                # Redirect to payment
-                return redirect(url_for('initiate_payment',amount=amount))
+                    flash('Invalid amount value', 'error')
+                    return redirect(url_for('jampad'))
+
+                # Redirect to payment with POST method preservation
+                return redirect(url_for('initiate_payment', amount=amount))
 
         except Exception as e:
             db.session.rollback()
@@ -233,6 +233,7 @@ def jampad():
 
 def save_admin_booking():
     """Save admin booking directly"""
+    print("broro")
     booking_data = session['pending_booking']
     booking = bookin(
         jampad_name=booking_data['jampad_name'],
