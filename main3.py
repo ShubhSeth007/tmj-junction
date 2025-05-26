@@ -399,7 +399,9 @@ def initiate_payment():
             'payment_capture': '1',
             'notes': {
                 'booking_for': f"{booking['jampad_name']} - {booking['time_slots']}"
-            }
+            },
+            'callback_url': url_for('payment_success', _external=True),
+            'redirect': True
         })
 
         return render_template('payment.html',
