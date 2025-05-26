@@ -387,14 +387,14 @@ def initiate_payment():
         return redirect(url_for('jampad'))
 
     booking = session['pending_booking']
-    amount = request.args.get('amount')# ₹599 in paise
-    amount=int(amount)
+    amount =100            #request.args.get('amount')# ₹599 in paise
+    #amount=int(amount)
     print(f"the amount is {amount}")
 
     try:
         # Create Razorpay order
         order = razorpay_client.order.create({
-            'amount': amount * 100,
+            'amount': amount ,     #* 100,
             'currency': 'INR',
             'payment_capture': '1',
             'notes': {
