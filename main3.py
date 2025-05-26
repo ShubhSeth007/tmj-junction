@@ -398,10 +398,10 @@ def initiate_payment():
             'currency': 'INR',
             'payment_capture': '1',
             'notes': {
-                'booking_for': f"{booking['jampad_name']} - {booking['time_slots']}"
+                'booking_for': f"{booking['jampad_name']} - {booking['time_slots']}",
+                'booking_data': json.dumps(booking)
             },
-            'callback_url': url_for('payment_success', _external=True),
-            'redirect': True
+
         })
 
         return render_template('payment.html',
@@ -423,104 +423,121 @@ def initiate_payment():
 
 @app.route("/payment/success")
 def payment_success():
-    if 'pending_booking' not in session:
-        flash('Session expired. Please start over.', 'error')
-        return redirect(url_for('jampad'))
-
-    payment_id = request.args.get('payment_id')
-    order_id = request.args.get('order_id')
-
+    payment_id = request.args.get('razorpay_payment_id', request.args.get('payment_id'))
+    order_id = request.args.get('razorpay_order_id', request.args.get('order_id'))
 
     try:
-        # Verify payment with Razorpay
+        # 1. Verify payment with Razorpay first
         payment = razorpay_client.payment.fetch(payment_id)
 
-        if payment['status'] == 'captured':
-            # Save to database
+        if payment['status'] != 'captured':
+            flash('Payment not captured successfully', 'error')
+            return redirect(url_for('payment_failed'))
+
+        # 2. Check if we have booking data
+        booking_data = None
+
+        # Try to get from session first
+        if 'pending_booking' in session:
             booking_data = session['pending_booking']
-            booking = bookin(  # Make sure this matches your model name
-                jampad_name=booking_data['jampad_name'],
-                band_name=booking_data['band_name'],
-                email=booking_data['email'],
-                phone=booking_data['phone'],
-                no_of_people=booking_data['no_of_people'],
-                microphones=booking_data['microphones'],
-                booking_date=booking_data['booking_date'],
-                time_slots=booking_data['time_slots'],
-                date=datetime.now().strftime('%Y-%m-%d'),
-                payment_id=order_id,
-                payment_status='completed'
-            )
-
-            db.session.add(booking)
-            db.session.commit()
-
-            # Create booking details for template
-            booking_details = {
-                'jampad_name': booking.jampad_name,
-                'booking_date': booking.booking_date,
-                'time_slots': booking.time_slots,
-                'payment_id': booking.payment_id,
-                'band_name': booking.band_name,
-                'microphones': booking.microphones,
-                'band_name': booking.band_name,
-                'no_of_people': booking.no_of_people
-            }
-
-            # Send confirmation email
-            if 'gmail-user' in params and params['gmail-user']:
-                try:
-                    # Email to user
-                    mail.send_message(
-                        'Booking Confirmation',
-                        sender=params['gmail-user'],
-                        recipients=[booking_data['email']],
-                        body=f"""Your booking for {booking_data['jampad_name']} is confirmed!
-
-            Date: {booking_data['booking_date']}
-            Time: {booking_data['time_slots']}
-            Band Name: {booking_data['band_name']}
-            Payment ID: {order_id}
-            """
-                    )
-
-                    # Email to admin
-                    mail.send_message(
-                        'New Booking Received',
-                        sender=params['gmail-user'],
-                        recipients=[params['gmail-user']],
-                        body=f"""A new booking has been made.
-
-            JamPad: {booking_data['jampad_name']}
-            Band Name: {booking_data['band_name']}
-            Date: {booking_data['booking_date']}
-            Time: {booking_data['time_slots']}
-            Payment ID: {order_id}
-            """
-                    )
-                except Exception as e:
-                    print(f"Email sending failed: {str(e)}")
-
-            # Clear session
-            session.pop('pending_booking', None)
-
-            # Debug print
-            print("Rendering success.html with booking:", booking_details)
-
-            # Render the template directly
-            return render_template('success.html',
-                                   booking=booking_details)
-
         else:
-            flash('Payment verification failed', 'error')
+            # Fallback: check Razorpay order notes
+            order = razorpay_client.order.fetch(order_id)
+            if 'notes' in order and 'booking_data' in order['notes']:
+                booking_data = json.loads(order['notes']['booking_data'])
+
+        if not booking_data:
+            flash('Booking information not found', 'error')
             return redirect(url_for('jampad'))
+
+        # 3. Check for duplicate payments
+        existing_booking = bookin.query.filter_by(payment_id=order_id).first()
+        if existing_booking:
+            flash('This payment was already processed', 'info')
+            return render_template('success.html', booking={
+                'jampad_name': existing_booking.jampad_name,
+                'booking_date': existing_booking.booking_date,
+                'time_slots': existing_booking.time_slots,
+                'payment_id': existing_booking.payment_id
+            })
+
+        # 4. Save to database
+        booking = bookin(
+            jampad_name=booking_data['jampad_name'],
+            band_name=booking_data['band_name'],
+            email=booking_data['email'],
+            phone=booking_data['phone'],
+            no_of_people=booking_data['no_of_people'],
+            microphones=booking_data['microphones'],
+            booking_date=booking_data['booking_date'],
+            time_slots=booking_data['time_slots'],
+            date=datetime.now().strftime('%Y-%m-%d'),
+            payment_id=order_id,
+            payment_status='completed'
+        )
+
+        db.session.add(booking)
+        db.session.commit()
+
+        # 5. Send emails (wrapped in try-except to not fail the whole process)
+        try:
+            if 'gmail-user' in params and params['gmail-user']:
+                # User email
+                mail.send_message(
+                    'Booking Confirmation',
+                    sender=params['gmail-user'],
+                    recipients=[booking_data['email']],
+                    body=f"""Your booking for {booking_data['jampad_name']} is confirmed!
+Date: {booking_data['booking_date']}
+Time: {booking_data['time_slots']}
+Band Name: {booking_data['band_name']}
+Payment ID: {order_id}"""
+                )
+
+                # Admin email
+                mail.send_message(
+                    'New Booking Received',
+                    sender=params['gmail-user'],
+                    recipients=[params['gmail-user']],
+                    body=f"""New booking:
+JamPad: {booking_data['jampad_name']}
+Band: {booking_data['band_name']}
+Date: {booking_data['booking_date']}
+Time: {booking_data['time_slots']}
+Payment ID: {order_id}"""
+                )
+        except Exception as e:
+            print(f"Email sending failed: {str(e)}")
+
+        # 6. Clear session and show success
+        session.pop('pending_booking', None)
+
+        return render_template('success.html', booking={
+            'jampad_name': booking.jampad_name,
+            'booking_date': booking.booking_date,
+            'time_slots': booking.time_slots,
+            'payment_id': booking.payment_id,
+            'band_name': booking.band_name,
+            'microphones': booking.microphones,
+            'no_of_people': booking.no_of_people
+        })
 
     except Exception as e:
         db.session.rollback()
-        print(f"Payment processing error: {str(e)}")  # Debug print
+        print(f"Payment processing error: {str(e)}")
         flash(f'Payment processing error: {str(e)}', 'error')
-        return redirect(url_for('jampad'))
+        return redirect(url_for('payment_failed'))
 
+
+@app.route("/payment/failed")
+def payment_failed():
+    error_code = request.args.get('error_code')
+    error_desc = request.args.get('error_description')
+    order_id = request.args.get('order_id')
+
+    # Store the error in session to display after redirect
+    flash(f'Payment failed (Error {error_code}): {error_desc}', 'error')
+    return redirect(url_for('jampad'))  # Or initiate_payment if you want to retry
 
 @app.route("/refund")
 def refund():

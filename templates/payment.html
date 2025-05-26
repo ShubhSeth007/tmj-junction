@@ -118,8 +118,11 @@
         ">Pay Now</button>
     </div>
 
-    <script>
+      <script>
         document.addEventListener("DOMContentLoaded", function () {
+            var btn = document.getElementById('rzp-button');
+            var loader = document.getElementById('loader');
+
             var options = {
                 "key": "{{ razorpay_key_id }}",
                 "amount": "{{ amount }}",
@@ -128,7 +131,11 @@
                 "description": "JamPad Booking",
                 "order_id": "{{ order_id }}",
                 "handler": function(response) {
-                    window.location.href = "{{ url_for('payment_success', _external=True) }}?payment_id=" + response.razorpay_payment_id + "&order_id=" + response.razorpay_order_id;
+                    // Add additional parameters you might need
+                    window.location.href = "{{ url_for('payment_success', _external=True) }}" +
+                        "?payment_id=" + response.razorpay_payment_id +
+                        "&order_id=" + response.razorpay_order_id +
+                        "&booking_id={{ booking.id if booking.id else '' }}";
                 },
                 "prefill": {
                     "name": "{{ name }}",
@@ -137,15 +144,39 @@
                 },
                 "theme": {
                     "color": "#6c5ce7"
+                },
+                "modal": {
+                    "ondismiss": function() {
+                        // Handle when user closes the modal without payment
+                        console.log("Payment modal closed");
+                        btn.disabled = false;
+                        loader.style.display = 'none';
+                    }
                 }
             };
 
             var rzp = new Razorpay(options);
 
-            document.getElementById('rzp-button').addEventListener('click', function(e) {
+            // Add error handling
+            rzp.on('payment.failed', function(response) {
+                console.error("Payment failed:", response.error);
+                window.location.href = "{{ url_for('payment_failed', _external=True) }}" +
+                    "?error_code=" + response.error.code +
+                    "&error_description=" + encodeURIComponent(response.error.description) +
+                    "&order_id={{ order_id }}";
+            });
+
+            btn.addEventListener('click', function(e) {
+                btn.disabled = true;
+                loader.style.display = 'block';
                 rzp.open();
                 e.preventDefault();
             });
+
+            // Auto-open Razorpay modal if needed (optional)
+            // window.onload = function() {
+            //     rzp.open();
+            // };
         });
     </script>
 </body>
