@@ -394,7 +394,7 @@ def initiate_payment():
     try:
         # Create Razorpay order
         order = razorpay_client.order.create({
-            'amount': amount ,     #* 100,
+            'amount': amount * 100,
             'currency': 'INR',
             'payment_capture': '1',
             'notes': {
