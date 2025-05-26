@@ -387,8 +387,8 @@ def initiate_payment():
         return redirect(url_for('jampad'))
 
     booking = session['pending_booking']
-    amount =100            #request.args.get('amount')# ₹599 in paise
-    #amount=int(amount)
+    amount =request.args.get('amount')# ₹599 in paise
+    amount=int(amount)
     print(f"the amount is {amount}")
 
     try:
