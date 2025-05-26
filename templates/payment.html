@@ -121,65 +121,79 @@
     </div>
 
       <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var btn = document.getElementById('rzp-button');
-            var loader = document.getElementById('loader');
+document.addEventListener("DOMContentLoaded", function () {
+    var btn = document.getElementById('rzp-button');
+    var loader = document.getElementById('loader');
 
-            var options = {
-                "key": "{{ razorpay_key_id }}",
-                "amount": "{{ amount }}",
-                "currency": "INR",
-                "name": "The Music Junction",
-                "description": "JamPad Booking",
-                "order_id": "{{ order_id }}",
-                "handler": function(response) {
-                    // Add additional parameters you might need
+    var options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ amount }}",
+        "currency": "INR",
+        "name": "The Music Junction",
+        "description": "JamPad Booking",
+        "order_id": "{{ order_id }}",
+        "handler": function(response) {
+            fetch("{{ url_for('verify_payment', _external=True) }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    payment_id: response.razorpay_payment_id,
+                    order_id: response.razorpay_order_id,
+                    signature: response.razorpay_signature
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
                     window.location.href = "{{ url_for('payment_success', _external=True) }}" +
                         "?payment_id=" + response.razorpay_payment_id +
-                        "&order_id=" + response.razorpay_order_id +
-                        "&booking_id={{ booking.id if booking.id else '' }}";
-                },
-                "prefill": {
-                    "name": "{{ name }}",
-                    "email": "{{ email }}",
-                    "contact": "{{ contact }}"
-                },
-                "theme": {
-                    "color": "#6c5ce7"
-                },
-                "modal": {
-                    "ondismiss": function() {
-                        // Handle when user closes the modal without payment
-                        console.log("Payment modal closed");
-                        btn.disabled = false;
-                        loader.style.display = 'none';
-                    }
+                        "&order_id=" + response.razorpay_order_id;
+                } else {
+                    window.location.href = "{{ url_for('payment_failed', _external=True) }}";
                 }
-            };
-
-            var rzp = new Razorpay(options);
-
-            // Add error handling
-            rzp.on('payment.failed', function(response) {
-                console.error("Payment failed:", response.error);
-                window.location.href = "{{ url_for('payment_failed', _external=True) }}" +
-                    "?error_code=" + response.error.code +
-                    "&error_description=" + encodeURIComponent(response.error.description) +
-                    "&order_id={{ order_id }}";
+            })
+            .catch(error => {
+                console.error("Verification error:", error);
+                window.location.href = "{{ url_for('payment_failed', _external=True) }}";
             });
+        },
+        "prefill": {
+            "name": "{{ name }}",
+            "email": "{{ email }}",
+            "contact": "{{ contact }}"
+        },
+        "theme": {
+            "color": "#6c5ce7"
+        },
+        "modal": {
+            "ondismiss": function() {
+                console.log("Payment modal closed");
+                btn.disabled = false;
+                if (loader) loader.style.display = 'none';
+            }
+        }
+    };
 
-            btn.addEventListener('click', function(e) {
-                btn.disabled = true;
-                loader.style.display = 'block';
-                rzp.open();
-                e.preventDefault();
-            });
+    var rzp = new Razorpay(options);
 
-            // Auto-open Razorpay modal if needed (optional)
-            // window.onload = function() {
-            //     rzp.open();
-            // };
-        });
-    </script>
+    rzp.on('payment.failed', function(response) {
+        console.error("Payment failed:", response.error);
+        window.location.href = "{{ url_for('payment_failed', _external=True) }}" +
+            "?error_code=" + response.error.code +
+            "&error_description=" + encodeURIComponent(response.error.description) +
+            "&order_id={{ order_id }}";
+    });
+
+    btn.addEventListener('click', function(e) {
+        btn.disabled = true;
+        if (loader) loader.style.display = 'block';
+        rzp.open();
+        e.preventDefault();
+    });
+});
+</script>
+
 </body>
 </html>

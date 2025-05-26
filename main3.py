@@ -528,6 +528,29 @@ Payment ID: {order_id}"""
         flash(f'Payment processing error: {str(e)}', 'error')
         return redirect(url_for('payment_failed'))
 
+@app.route("/verify_payment", methods=["POST"])
+def verify_payment():
+    data = request.json
+    payment_id = data.get("payment_id")
+    order_id = data.get("order_id")
+    signature = data.get("signature")
+
+    try:
+        client = razorpay.Client(auth=(params['razorpay_key_id'], params['razorpay_key_secret']))
+        params_dict = {
+            'razorpay_order_id': order_id,
+            'razorpay_payment_id': payment_id,
+            'razorpay_signature': signature
+        }
+
+        # Verifies payment signature
+        client.utility.verify_payment_signature(params_dict)
+
+        return jsonify({"status": "success"})
+
+    except razorpay.errors.SignatureVerificationError:
+        return jsonify({"status": "failed"}), 400
+
 
 @app.route("/payment/failed")
 def payment_failed():
