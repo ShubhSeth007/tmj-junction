@@ -2,256 +2,206 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Confirmed | JamPad</title>
+    <title>Booking Confirmation | JamPad</title>
     <style>
-        /* Embedded CSS Styles */
+        /* Base Styles */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
-            color: #333;
-            line-height: 1.6;
+            font-family: 'Arial', sans-serif;
+            color: #000000;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
         }
 
+        /* A4 Container */
         .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            page-break-inside: avoid;
         }
 
-        /* Success Message */
-        .success-message {
-            background-color: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
+        /* Watermark */
+        .watermark {
+            position: fixed;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            opacity: 0.15;
+            z-index: 1;
+            pointer-events: none;
         }
 
-        .confirmation-header {
-            margin-bottom: 30px;
+        .watermark img {
+            width: 400px;
+            height: 400px;
+            object-fit: contain;
         }
 
-        .confirmation-header svg {
-            margin-bottom: 15px;
-        }
-
-        h2 {
-            color: #4CAF50;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-
-        .subtext {
-            color: #666;
-            font-size: 1.1em;
-            margin-bottom: 20px;
-        }
-
-        /* Booking Details */
-        .booking-details {
-            background-color: #f9f9f9;
-            border-radius: 8px;
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, rgb(71, 150, 224), rgb(89, 151, 208)) !important;
             padding: 25px;
-            margin: 25px 0;
-            text-align: left;
+            text-align: center;
+            color: white !important;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
         }
 
-        .booking-details h3 {
-            margin-top: 0;
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            font-size: 20px;
+        /* Content Area */
+        .content {
+            padding: 20px;
+            height: calc(297mm - 160px);
+            box-sizing: border-box;
+            position: relative;
+            z-index: 2;
         }
 
-        .detail-row {
-            display: flex;
+        /* Details Section */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
             margin: 15px 0;
-            flex-wrap: wrap;
         }
 
-        .detail-label {
-            font-weight: bold;
-            flex: 1;
-            color: #555;
-            min-width: 120px;
+        .detail-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
         }
 
-        .detail-value {
-            flex: 2;
-            color: #222;
-        }
-
-        /* Additional Info */
-        .additional-info {
-            font-size: 0.9em;
-            color: #666;
-            margin: 20px 0;
-            line-height: 1.6;
-            padding: 0 10px;
-        }
-
-        /* Buttons */
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 12px 25px;
-            border-radius: 5px;
-            text-decoration: none;
+        .label {
             font-weight: 600;
-            transition: all 0.3s ease;
-            display: inline-block;
+            color: #000000;
+            margin-bottom: 4px;
         }
 
-        .home-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-        }
-
-        .home-btn:hover {
-            background-color: #3e8e41;
-            transform: translateY(-2px);
-        }
-
-        .print-btn {
-            background-color: white;
-            color: #333;
-            border: 1px solid #ddd;
-        }
-
-        .print-btn:hover {
-            background-color: #f1f1f1;
-            transform: translateY(-2px);
-        }
-
-        /* Checkmark Animation */
-        .checkmark {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            display: block;
-            stroke-width: 4;
-            stroke: #4CAF50;
-            stroke-miterlimit: 10;
-            margin: 0 auto 20px;
-            animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
-        }
-
-        @keyframes fill {
-            100% {
-                box-shadow: inset 0 0 0 100px rgba(76, 175, 80, 0.1);
+        /* Print Optimization */
+        @media print {
+            body {
+                background: white !important;
+                margin: 0 !important;
             }
-        }
 
-        @keyframes scale {
-            0%, 100% {
-                transform: none;
-            }
-            50% {
-                transform: scale3d(1.1, 1.1, 1);
-            }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 600px) {
             .container {
-                margin: 20px;
-                padding: 10px;
+                margin: 0 !important;
+                width: 100% !important;
+                height: 100vh !important;
+                border: none !important;
             }
 
-            .action-buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .btn {
-                width: 100%;
-                text-align: center;
-            }
-
-            .detail-row {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .detail-label, .detail-value {
-                flex: auto;
-                width: 100%;
+            .watermark {
+                opacity: 0.2 !important;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Watermark -->
+        <div class="watermark">
+            <img src="TMJ final logo.png" alt="Watermark">
+        </div>
 
-        <div class="success-message">
-            <img src="{{ url_for('static', filename='/assets/img/TMJ.png') }}" alt="Booking Success" style="max-width: 120px; margin: 0 auto 20px; display: block;">
-            <!-- Confirmation Header -->
-            <div class="confirmation-header">
-                <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                </svg>
-                <h2>🎉 Booking Confirmed!</h2>
-                <p class="subtext">Your JamPad reservation has been successfully booked.</p>
+        <!-- Content -->
+        <div class="content">
+            <div class="header">
+                <h1>JAMPAD BOOKING CONFIRMATION</h1>
+                <p>Confirmation ID: {{ booking.confirmation_id }}</p>
+            </div>
+
+            <!-- Status -->
+            <div style="text-align: center; margin: 20px 0;">
+                <div style="font-size: 40px; color: #2dc35f;">✓</div>
+                <h2>🎊 Booking Confirmed Successfully! 🎉</h2>
             </div>
 
             <!-- Booking Details -->
-            <div class="booking-details">
-                <h3>Booking Summary</h3>
-                <div class="detail-row">
-                    <span class="detail-label">JamPad:</span>
-                    <span class="detail-value">{{ booking.jampad_name }}</span>
+            <div class="detail-card">
+                <h2 style="border-bottom: 2px solid #000; padding-bottom: 8px;">Booking Information</h2>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="label">JamPad Name</div>
+                        <div class="value">{{ booking.jampad_name }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Band Name</div>
+                        <div class="value">{{ booking.band_name }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Booking Date</div>
+                        <div class="value">{{ booking.booking_date }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Time Slot</div>
+                        <div class="value">{{ booking.time_slots }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Participants</div>
+                        <div class="value">{{ booking.no_of_people }} people</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Microphones</div>
+                        <div class="value">{{ booking.microphones }} microphones</div>
+                    </div><!-- Your booking details here -->
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">band_name:</span>
-                    <span class="detail-value">{{ booking.band_name }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Time Slots:</span>
-                    <span class="detail-value">{{ booking.time_slots }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Person count:</span>
-                    <span class="detail-value">{{ booking.no_of_people }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Microphones:</span>
-                    <span class="detail-value">{{ booking.microphones }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Confirmation #:</span>
-                    <span class="detail-value">{{ booking.payment_id }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">booking_date #:</span>
-                    <span class="detail-value">{{ booking.booking_date }}</span>
-                </div>
+            </div>
+            <br><br>
 
+            <!-- Payment Details -->
+            <div class="detail-card">
+                <h2 style="color: #000000; margin-top: 0; border-bottom: 2px solid #000; padding-bottom: 10px;">Payment Summary</h2>
+                <div class="details-grid">
+                    <!-- Add payment details here -->
+                     <div class="confirmation-box">
+                
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="label">Total Amount</div>
+                        <div class="value">{{ booking.total_price }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Payment Status</div>
+                        <div class="value" style="color: #4CAF50;">Paid ✓</div>
+                    </div>
+                </div>
+            </div>
+            </div>
             </div>
 
-            <!-- Additional Information -->
-            <div class="additional-info">
-                <p>A confirmation email has been sent to your registered email address.</p>
-                <p>Please arrive 15 minutes before your scheduled time and bring your confirmation number.</p>
+            <!-- Footer -->
+            <div style="text-align: center; margin-top: 20px; color: #666;">
+                <p>Present this confirmation at reception • Contact: contact.themusicjunction@gmail.com</p>
+                <p>Phone: +91 8076272529</p>
+                <p>⚠️ Entry Rules: Footwear (shoes/slippers) • Cigarettes • Food items strictly prohibited</p>
+                <p>💧 Only sealed drinking water allowed inside jamming room</p>
             </div>
+        
 
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <a href="{{ url_for('index') }}" class="btn home-btn">Return Home</a>
-                <a href="#" class="btn print-btn" onclick="window.print()">Print Confirmation</a>
-            </div>
-        </div>
+    <div style="text-align: center; margin: 20px;" class="print-hide">
+        <button onclick="window.print()" style="
+            padding: 12px 30px;
+            background: #3d82c3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;">
+            Print Confirmation
+        </button>
+    </div>
+    </div>
     </div>
 </body>
 </html>
