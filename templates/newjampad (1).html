@@ -71,7 +71,8 @@
         color: white;
     }
 
-    .time-slot.booked .time-slot-label {
+    .time-slot.booked .time-slot-label,
+    .time-slot.past .time-slot-label {
         background: #e0e0e0;
         color: #999;
         cursor: not-allowed;
@@ -280,8 +281,6 @@
 </head>
 <body>
 
-
-
     <header class="header">
         <div class="container">
             <div class="header-container">
@@ -330,7 +329,6 @@
                 <div class="gallery-item">
                     <img src="/static/assets/img/jampadtmj.jpeg" alt="Recording Booth">
                     <div class="media-caption">TMJ</div>
-                    <div class="media-caption">TMJ</div>
                 </div>
                 <div class="gallery-item">
                     <img src="/static/assets/img/jampadtmj.jpeg" alt="Recording Booth">
@@ -345,11 +343,6 @@
                     <div class="media-caption">TMJ</div>
                 </div>
             </div>
-
-            <!-- Equipment List -->
-
-
-
         </section>
 
         <!-- Booking Form -->
@@ -372,23 +365,25 @@
                         </div>
                     </div>
                 </div>
-<div class="form-group">
+                
+                <div class="form-group">
                     <label for="bookingDate" class="form-label">Date</label>
                     <input type="text" name="bookingDate" id="bookingDate" class="form-control flatpickr-input" readonly required>
                 </div>
 
                 <div class="form-group full-width">
-    <label class="form-label">Time Slots (1hr each)</label>
-    <div class="time-slots-container" id="timeSlots">
-        <!-- Time slots will be generated here -->
-    </div>
+                    <label class="form-label">Time Slots (1hr each)</label>
+                    <div class="time-slots-container" id="timeSlots">
+                        <!-- Time slots will be generated here -->
+                    </div>
+                    <input type="hidden" name="timeSlots" id="timeSlotsHidden">
+                </div>
+                
                 <div class="form-group">
                     <label for="bandName" class="form-label">Band Name</label>
                     <input type="text" name="bandName" id="bandName" class="form-control" required placeholder="Enter your Band Name">
                 </div>
 
-    <input type="hidden" name="timeSlots" id="timeSlotsHidden">
-</div>
                 <div class="form-group">
                     <label for="email" class="form-label">Email</label>
                     <input type="email" name="email" id="email" class="form-control" required placeholder="Enter your email">
@@ -396,31 +391,32 @@
 
                 <div class="form-group">
                     <label for="phone" class="form-label">Phone</label>
-
                     <input type="tel" id="phone" name="phone" class="form-control" required pattern="^\d{10}$" minlength="10" maxlength="10" placeholder="Enter 10-digit phone number">
-
                 </div>
 
                 <div class="form-group">
                     <label for="people" class="form-label">Number of People</label>
                     <input type="number" name="people" id="people" class="form-control"
-                           min="1" required onchange="calculatePrice()" placeholder="9 people for TMJ Jampad  and 7 for BR Jampad are free">
+                           min="1" required onchange="calculatePrice()" placeholder="9 people for TMJ Jampad and 7 for BR Jampad are free">
                 </div>
 
                 <div class="form-group">
-    <label for="mics" class="form-label">Microphones</label>
-    <input type="number" name="mics" id="mics" class="form-control"
-           min="0" max="10" required oninput="calculatePrice()" placeholder="5 Microphones are free for both jampads and Min 0 Max 10">
-</div>
-
-
+                    <label for="mics" class="form-label">Microphones</label>
+                    <input type="number" name="mics" id="mics" class="form-control"
+                           min="0" max="10" required oninput="calculatePrice()" placeholder="5 Microphones are free for both jampads and Min 0 Max 10">
+                </div>
+                
+                <!-- Equipment Setup Field -->
+                <div class="form-group full-width">
+                    <label for="equipmentSetup" class="form-label">Equipment Setup If any (Optional)</label>
+                    <textarea id="equipmentSetup" name="equipmentSetup" class="form-control" rows="3" placeholder="Write your  equipment setup "></textarea>
+                </div>
 
                 <div class="form-group full-width" id="priceSummary">
                     <h3>Price Breakdown</h3>
                     <div id="priceDetails"></div>
                     <h3>Total: ₹<span id="totalAmount">0</span></h3>
                     <input type="hidden" name="amount" id="amount">
-
                 </div>
 
                 <div class="form-group full-width">
@@ -432,30 +428,29 @@
                         <i class="fas fa-lock"></i> Submit and Make Payment
                     </button>
                 </div>
+                
                 <div id="confirmationModal" class="modal">
-    <div class="modal-content">
-        <h2>Booking Confirmation</h2>
-        <div id="confirmationMessage"></div>
-        <button onclick="closeModal()" class="modal-close">Close</button>
-    </div>
-</div>
+                    <div class="modal-content">
+                        <h2>Booking Confirmation</h2>
+                        <div id="confirmationMessage"></div>
+                        <button onclick="closeModal()" class="modal-close">Close</button>
+                    </div>
+                </div>
             </form>
         </section>
     </div>
 
-
     {% if existing_booking %}
-  <div class="existing-booking-info">
-    <h3>Booking Conflict</h3>
-    <p><strong>Already booked by:</strong> {{ existing_booking.band_name }}</p>
-    <p><strong>Date:</strong> {{ existing_booking.booking_date }}</p>
-    <p><strong>Time Slot(s):</strong> {{ existing_booking.time_slots }}</p>
-  </div>
-{% endif %}
-
+        <div class="existing-booking-info">
+            <h3>Booking Conflict</h3>
+            <p><strong>Already booked by:</strong> {{ existing_booking.band_name }}</p>
+            <p><strong>Date:</strong> {{ existing_booking.booking_date }}</p>
+            <p><strong>Time Slot(s):</strong> {{ existing_booking.time_slots }}</p>
+        </div>
+    {% endif %}
 
     <!-- Footer -->
-   <footer class="footer">
+    <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
@@ -479,13 +474,9 @@
                         <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
                         <li><a href="{{ url_for('jampad') }}"><i class="fas fa-chevron-right"></i> Jampad</a></li>
                          <li><a href="{{ url_for('admin') }}"><i class="fas fa-chevron-right"></i> Admin</a></li>
-
-
                         <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact</a></li>
                     </ul>
                 </div>
-
-
 
                 <div class="footer-col">
                     <h3>Contact Info</h3>
@@ -513,43 +504,112 @@
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
+   
     let bookedSlots = [];
+    let datePicker;
 
-    let datePicker = flatpickr("#bookingDate", {
-        minDate: "today",
-        dateFormat: "d-m-Y",
-        onChange: function (selectedDates, dateStr) {
-            if (dateStr) {
-                const parts = dateStr.split("-");
-                const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-                generateTimeSlots();
-                setTimeout(() => checkBookedSlots(formattedDate), 10);
+    // Initialize date picker
+    function initializeDatePicker() {
+        datePicker = flatpickr("#bookingDate", {
+            minDate: "today",
+            dateFormat: "d-m-Y",
+            onChange: function (selectedDates, dateStr) {
+                if (dateStr) {
+                    const parts = dateStr.split("-");
+                    const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    generateTimeSlots();
+                    setTimeout(() => checkBookedSlots(formattedDate), 10);
+                }
             }
-        }
-    });
+        });
+    }
 
+    // Generate time slots based on selected jampad
     function generateTimeSlots() {
         const timeSlotsContainer = document.getElementById('timeSlots');
         timeSlotsContainer.innerHTML = '';
+        
+        // Get jampad selection
+        const jampad = document.querySelector('input[name="jampad"]:checked').value;
+        
+        // Set different hours for each jampad
+        let startHour, endHour;
+        if (jampad === 'tmj') {
+            startHour = 8;  // TMJ: 8 AM to 10 PM
+            endHour = 22;
+        } else {
+            startHour = 9;  // BR: 9 AM to 9 PM
+            endHour = 21;
+        }
 
-        for (let hour = 8; hour <= 22; hour++) {
-            const startHour = hour.toString().padStart(2, '0');
-            const endHour = (hour + 1).toString().padStart(2, '0');
-            const slotTime = `${startHour}:00-${endHour}:00`;
+        // Get current time
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+        
+        // Check if selected date is today
+        const selectedDate = document.getElementById('bookingDate').value;
+        const today = new Date();
+        const todayStr = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth()+1).toString().padStart(2, '0')}-${today.getFullYear()}`;
+        const isToday = selectedDate === todayStr;
+
+        // Generate slots
+        for (let hour = startHour; hour < endHour; hour++) {
+            const startHourStr = hour.toString().padStart(2, '0');
+            const endHourStr = (hour + 1).toString().padStart(2, '0');
+            const slotTime = `${startHourStr}:00-${endHourStr}:00`;
 
             const slot = document.createElement('div');
             slot.className = 'time-slot';
             slot.setAttribute('data-slot', slotTime);
 
+            // Check if slot is in the past (for today only)
+            let isPast = false;
+            if (isToday) {
+                // Slot is past if its hour is less than current hour, 
+                // or equal to current hour with minutes already passed
+                isPast = (hour < currentHour) || 
+                         (hour === currentHour && currentMinute > 0);
+            }
+
+            const slotId = `slot${hour}`;
             slot.innerHTML = `
-                <input type="checkbox" id="slot${hour}" name="slot${hour}" value="${slotTime}" style="display: none;">
-                <label for="slot${hour}" class="time-slot-label">${startHour}:00 - ${endHour}:00</label>
+                <input type="checkbox" id="${slotId}" name="${slotId}" value="${slotTime}" style="display: none;" ${isPast ? 'disabled' : ''}>
+                <label for="${slotId}" class="time-slot-label">${startHourStr}:00 - ${endHourStr}:00</label>
             `;
+
+            if (isPast) {
+                slot.classList.add('past');
+            }
 
             timeSlotsContainer.appendChild(slot);
         }
+        
+        // Add event listeners to the new time slots
+        attachSlotEventListeners();
     }
 
+    // Add click handlers to time slots
+    function attachSlotEventListeners() {
+        document.querySelectorAll('.time-slot-label').forEach(label => {
+            label.addEventListener('click', function(e) {
+                const checkbox = document.getElementById(label.htmlFor);
+                if (!checkbox.disabled) {
+                    checkbox.checked = !checkbox.checked;
+                    if (checkbox.checked) {
+                        label.classList.add('selected');
+                    } else {
+                        label.classList.remove('selected');
+                    }
+                    calculatePrice();
+                }
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+    }
+
+    // Check for already booked slots
     async function checkBookedSlots(date) {
         try {
             const jampad = document.querySelector('input[name="jampad"]:checked').value;
@@ -586,102 +646,78 @@
         }
     }
 
-    // Handle time slot selection
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('time-slot-label')) {
-            const label = e.target;
-            const checkbox = document.getElementById(label.htmlFor);
-
-            if (!checkbox.disabled) {
-                checkbox.checked = !checkbox.checked;
-                if (checkbox.checked) {
-                    label.classList.add('selected');
-                } else {
-                    label.classList.remove('selected');
-                }
-                calculatePrice();
-            }
-            e.preventDefault();
-            e.stopPropagation();
-        }
-    });
-
+    // Calculate booking price
     function calculatePrice(event) {
-    // Prevent default behavior if this was triggered by an event
-    if (event) {
-        event.preventDefault();
-        event.stopPropagation();
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        const isTMJ = document.getElementById('tmj').checked;
+        const people = parseInt(document.getElementById('people').value) || 0;
+        const mics = parseInt(document.getElementById('mics').value) || 0;
+        const slots = document.querySelectorAll('input[type="checkbox"][name^="slot"]:checked').length;
+
+        const maxPeople = isTMJ ? 11 : 15;
+        document.getElementById('people').max = maxPeople;
+
+        if (people > maxPeople) {
+            alert(`Maximum ${maxPeople} people allowed for this JamPad`);
+            document.getElementById('people').value = maxPeople;
+            return;
+        }
+
+        let basePrice = 0;
+        if (isTMJ) {
+            basePrice = slots >= 2 ? 1198 + (slots - 2) * 499 : 599 * slots;
+        } else {
+            basePrice = slots >= 2 ? 820 + (slots - 2) * 360 : 410 * slots;
+        }
+
+        const freePeople = isTMJ ? 9 : 7;
+        const freeMics = 5;
+        const peopleCharge = Math.max(people - freePeople, 0) * 60;
+        const micCharge = Math.max(mics - freeMics, 0) * 60;
+
+        const total = basePrice + peopleCharge + micCharge;
+
+        document.getElementById('priceDetails').innerHTML = `
+            <p>Base Price (${slots} hrs): ₹${basePrice}</p>
+            ${peopleCharge > 0 ? `<p>Extra People: ₹${peopleCharge}</p>` : ''}
+            ${micCharge > 0 ? `<p>Extra Mics: ₹${micCharge}</p>` : ''}
+        `;
+
+        document.getElementById('totalAmount').textContent = total;
+        document.getElementById('amount').value = total;
     }
 
-    const isTMJ = document.getElementById('tmj').checked;
-    const people = parseInt(document.getElementById('people').value) || 0;
-    const mics = parseInt(document.getElementById('mics').value) || 0;
-    const slots = document.querySelectorAll('input[type="checkbox"][name^="slot"]:checked').length;
+    // Handle form submission
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-    const maxPeople = isTMJ ? 11 : 15;
-    document.getElementById('people').max = maxPeople;
+        // Validate form
+        const timeSlots = Array.from(document.querySelectorAll('input[type="checkbox"][name^="slot"]:checked'))
+                             .map(checkbox => checkbox.value);
 
-    if (people > maxPeople) {
-        alert(`Maximum ${maxPeople} people allowed for this JamPad`);
-        document.getElementById('people').value = maxPeople;
-        return;
-    }
+        if (timeSlots.length === 0) {
+            alert("Please select at least one time slot");
+            return;
+        }
 
-    let basePrice = 0;
-    if (isTMJ) {
-        basePrice = slots >= 2 ? 1198 + (slots - 2) * 499 : 599 * slots;
-    } else {
-        basePrice = slots >= 2 ? 820 + (slots - 2) * 360 : 410 * slots;
-    }
+        document.getElementById('timeSlotsHidden').value = timeSlots.join(',');
 
-    const freePeople = isTMJ ? 9 : 7;
-    const freeMics = 5;
-    const peopleCharge = Math.max(people - freePeople, 0) * 60;
-    const micCharge = Math.max(mics - freeMics, 0) * 60;
-
-    const total = basePrice + peopleCharge + micCharge;
-
-    document.getElementById('priceDetails').innerHTML = `
-        <p>Base Price (${slots} hrs): ₹${basePrice}</p>
-        ${peopleCharge > 0 ? `<p>Extra People: ₹${peopleCharge}</p>` : ''}
-        ${micCharge > 0 ? `<p>Extra Mics: ₹${micCharge}</p>` : ''}
-    `;
-
-    document.getElementById('totalAmount').textContent = total;
-    document.getElementById('amount').value = total;
-}
-
-
-document.getElementById('bookingForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    // Validate form
-    const timeSlots = Array.from(document.querySelectorAll('input[type="checkbox"][name^="slot"]:checked'))
-                         .map(checkbox => checkbox.value);
-
-    if (timeSlots.length === 0) {
-        alert("Please select at least one time slot");
-        return;
-    }
-
-    document.getElementById('timeSlotsHidden').value = timeSlots.join(',');
-
-    // Submit form
-    this.submit();
-});
-
-   function handlePaymentCompletion(response) {
-    // This will be called after successful payment
-    fetch(`/payment/success?payment_id=${response.razorpay_payment_id}&order_id=${response.razorpay_order_id}`)
-    .then(() => {
-        window.location.href = "{{ url_for('index') }}";
+        // Submit form
+        this.submit();
     });
-}
 
+    // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
+        initializeDatePicker();
+        
         // Initialize jampad selection
         document.querySelectorAll('input[name="jampad"]').forEach(radio => {
             radio.addEventListener('change', function() {
+                generateTimeSlots();
                 const date = document.getElementById('bookingDate').value;
                 if (date) {
                     const parts = date.split("-");
@@ -692,11 +728,10 @@ document.getElementById('bookingForm').addEventListener('submit', function(e) {
             });
         });
 
-        // Initial load
+        // Generate initial time slots
         generateTimeSlots();
-    });
-
-     // Mobile menu toggle (if not already in your main JS)
+        
+        // Mobile menu toggle
         const mobileMenu = document.getElementById('mobile-menu');
         const navLinks = document.querySelector('.nav-links');
 
@@ -706,6 +741,14 @@ document.getElementById('bookingForm').addEventListener('submit', function(e) {
                 mobileMenu.classList.toggle('active');
             });
         }
+    });
+
+    // Close confirmation modal
+    function closeModal() {
+        document.getElementById('confirmationModal').style.display = 'none';
+    }
 </script>
+
+    
 </body>
 </html>
