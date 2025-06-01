@@ -264,6 +264,8 @@ def save_admin_booking():
 
 JamPad: {booking_data['jampad_name']}
 Date: {booking_data['booking_date']}
+Microphones: {booking_data['microphones']}
+People count: {booking_data['no_of_people']}
 Time Slot: {booking_data['time_slots']}
 Band Name: {booking_data['band_name']}
 Status: Admin Booking
@@ -279,6 +281,8 @@ Status: Admin Booking
 
 JamPad: {booking_data['jampad_name']}
 Band Name: {booking_data['band_name']}
+Microphones: {booking_data['microphones']}
+People count: {booking_data['no_of_people']}
 Date: {booking_data['booking_date']}
 Time Slot: {booking_data['time_slots']}
 Status: Admin Booking
@@ -502,6 +506,8 @@ Payment ID: {order_id}"""
                     body=f"""New booking:
 JamPad: {booking_data['jampad_name']}
 Band: {booking_data['band_name']}
+Microphones: {booking_data['microphones']}
+People count: {booking_data['no_of_people']}
 Date: {booking_data['booking_date']}
 Time: {booking_data['time_slots']}
 Payment ID: {order_id}"""
