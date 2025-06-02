@@ -270,6 +270,8 @@ JamPad: {booking_data['jampad_name']}
 Date: {booking_data['booking_date']}
 Microphones: {booking_data['microphones']}
 People count: {booking_data['no_of_people']}
+Mail: {booking_data['email']}
+Phone no: {booking_data['phone']}
 Time Slot: {booking_data['time_slots']}
 Band Name: {booking_data['band_name']}
 Equipment Setup: {booking_data['equipmentSetup']}
@@ -288,6 +290,8 @@ JamPad: {booking_data['jampad_name']}
 Band Name: {booking_data['band_name']}
 Microphones: {booking_data['microphones']}
 People count: {booking_data['no_of_people']}
+Mail: {booking_data['email']}
+Phone no: {booking_data['phone']}
 Date: {booking_data['booking_date']}
 Equipment Setup: {booking_data['equipmentSetup']}
 Time Slot: {booking_data['time_slots']}
@@ -515,6 +519,8 @@ JamPad: {booking_data['jampad_name']}
 Band: {booking_data['band_name']}
 Microphones: {booking_data['microphones']}
 People count: {booking_data['no_of_people']}
+Mail: {booking_data['email']}
+Phone no: {booking_data['phone']}
 equipment setup: {booking_data['equipmentSetup']}
 Date: {booking_data['booking_date']}
 Time: {booking_data['time_slots']}
