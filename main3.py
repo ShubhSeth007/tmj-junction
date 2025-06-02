@@ -75,6 +75,7 @@ class bookin(db.Model):
     microphones = db.Column(db.String(5), nullable=False)
     booking_date = db.Column(db.String(10), nullable=False)
     time_slots = db.Column(db.String(200), nullable=False)
+    equipmentSetup= db.Column(db.String(200), nullable=False,default='NULL')
     date = db.Column(db.String(12), nullable=True)
     payment_id = db.Column(db.String(100), nullable=True)
     payment_status = db.Column(db.String(20), nullable=False, default='pending')
@@ -166,10 +167,11 @@ def jampad():
             time_slots = request.form.get('timeSlots', '')
             booking_date_str = request.form.get('bookingDate')
             amount = request.form.get('amount')  # Get amount from form
+            equipmentSetup = request.form.get('equipmentSetup')
 
             # Validate required fields
             if not all([jampad_name, band_name, email, phone, no_of_people, microphones, time_slots, booking_date_str,
-                        amount]):
+                        amount, equipmentSetup]):
 
                 flash('Please fill all required fields', 'error')
                 return redirect(url_for('jampad'))
@@ -205,7 +207,8 @@ def jampad():
                 'microphones': microphones,
                 'booking_date': db_date_str,
                 'time_slots': time_slots,
-                'amount': amount
+                'amount': amount,
+                'equipmentSetup': equipmentSetup
             }
             session.modified = True
             print(f"Session stored: {session.get('pending_booking')}")
@@ -233,7 +236,7 @@ def jampad():
 
 def save_admin_booking():
     """Save admin booking directly"""
-    print("broro")
+
     booking_data = session['pending_booking']
     booking = bookin(
         jampad_name=booking_data['jampad_name'],
@@ -244,6 +247,7 @@ def save_admin_booking():
         microphones=booking_data['microphones'],
         booking_date=booking_data['booking_date'],
         time_slots=booking_data['time_slots'],
+        equipmentSetup=booking_data['equipmentSetup'],
         date=datetime.now().strftime('%Y-%m-%d'),
         payment_status='admin_booking',
         is_admin_booking=True
@@ -268,6 +272,7 @@ Microphones: {booking_data['microphones']}
 People count: {booking_data['no_of_people']}
 Time Slot: {booking_data['time_slots']}
 Band Name: {booking_data['band_name']}
+Equipment Setup: {booking_data['equipmentSetup']}
 Status: Admin Booking
 """
             )
@@ -284,6 +289,7 @@ Band Name: {booking_data['band_name']}
 Microphones: {booking_data['microphones']}
 People count: {booking_data['no_of_people']}
 Date: {booking_data['booking_date']}
+Equipment Setup: {booking_data['equipmentSetup']}
 Time Slot: {booking_data['time_slots']}
 Status: Admin Booking
 """
@@ -474,6 +480,7 @@ def payment_success():
             no_of_people=booking_data['no_of_people'],
             microphones=booking_data['microphones'],
             booking_date=booking_data['booking_date'],
+            equipmentSetup=booking_data['equipmentSetup'],
             time_slots=booking_data['time_slots'],
             date=datetime.now().strftime('%Y-%m-%d'),
             payment_id=order_id,
@@ -508,6 +515,7 @@ JamPad: {booking_data['jampad_name']}
 Band: {booking_data['band_name']}
 Microphones: {booking_data['microphones']}
 People count: {booking_data['no_of_people']}
+equipment setup: {booking_data['equipmentSetup']}
 Date: {booking_data['booking_date']}
 Time: {booking_data['time_slots']}
 Payment ID: {order_id}"""
