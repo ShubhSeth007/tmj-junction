@@ -316,6 +316,34 @@
         width: 90%;
         text-align: center;
     }
+
+     /* Musical Notes Animation - Theme Matched */
+        .musical-note {
+            position: fixed;
+            bottom: -50px;
+            font-size: 24px;
+            opacity: 0;
+            z-index: 1000;
+            pointer-events: none;
+            animation: floatUp 4s ease-in-out forwards;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(0.8);
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50vh) rotate(180deg) scale(1.1);
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg) scale(0.8);
+                opacity: 0;
+            }
+        }
 </style>
 </head>
 <body>
@@ -351,50 +379,11 @@
         </div>
     </header>
     <div class="container">
-        <!-- Gallery Section -->
-       <section class="gallery-section">
-            <h2 class="section-title">The Music Junction  JamPad</h2>
-            <p style="text-align: center; margin-bottom: 1rem; color: #666; max-width: 800px; margin-left: auto; margin-right: auto;">
-                Our professional JamPad is a soundproof space equipped with premium instruments . Perfect for bands, solo artists looking for a creative space to practice or jam.
-            </p>
-
-            <div class="gallery-container">
-                <div class="gallery-item">
-                    <img src="/static/assets/img/personjampad.jpeg" alt="JamPad Interior">
-                    <div class="media-caption">Main Jampad area</div>
-                </div>
-                <div class="gallery-item">
-                    <img src="/static/assets/img/mixerjampadtmj.jpeg" alt="Drum Set">
-                    <div class="media-caption">TMJ</div>
-                </div>
-                <div class="gallery-item">
-                    <img src="/static/assets/img/jampadtmj.jpeg" alt="Recording Booth">
-                    <div class="media-caption">TMJ</div>
-                    <div class="media-caption">TMJ</div>
-                </div>
-                <div class="gallery-item">
-                    <img src="/static/assets/img/jampadtmj.jpeg" alt="Recording Booth">
-                    <div class="media-caption">TMJ</div>
-                </div>
-                <div class="gallery-item">
-                    <img src="/static/assets/img/marshaltmj.jpeg" alt="Control Room">
-                    <div class="media-caption">TMJ</div>
-                </div>
-                <div class="gallery-item">
-                    <img src="/static/assets/img/drumrmj.jpg" alt="Guitar Collection">
-                    <div class="media-caption">TMJ</div>
-                </div>
-            </div>
-
-            <!-- Equipment List -->
-
-
-
-        </section>
+       
 
         <!-- Booking Form -->
         <section class="booking-section">
-            <h2 class="booking-title">Book Your Jam Session</h2>
+            <h2 class="booking-title">Admin Booking Portal</h2>
             <form id="bookingForm" class="booking-form" action="/jampad" method="post">
                 <div class="form-group full-width">
                     <label class="form-label">Select JamPad</label>
@@ -453,8 +442,8 @@
                 </div>
 
                <div class="form-group full-width">
-                    <label for="equipmentSetup" class="form-label">Equipment Setup If any (Optional)</label>
-                    <textarea id="equipmentSetup" name="equipmentSetup" class="form-control" rows="3" placeholder="Write your  equipment setup "></textarea>
+                    <label for="equipmentSetup" class="form-label">Equipment Setup </label>
+                    <textarea id="equipmentSetup" name="equipmentSetup" class="form-control" rows="3"></textarea>
                 </div>
 
                 <div class="form-group full-width" id="priceSummary">
@@ -810,6 +799,65 @@
     function closeModal() {
         document.getElementById('confirmationModal').style.display = 'none';
     }
+
+     // Musical notes animation - using your theme colors
+        function createMusicalNote() {
+            const notes = ['♪', '♫', '♩', '♬', '♭', '♮', '♯'];
+            const themeColors = [
+                '#6c5ce7',  // primary purple
+                '#a29bfe',  // secondary light purple
+                '#fd79a8',  // accent pink
+                '#00cec9',  // teal (complementary)
+                '#fdcb6e',  // yellow (complementary)
+                '#e84393'   // darker pink
+            ];
+            
+            const note = document.createElement('div');
+            note.className = 'musical-note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = Math.random() * 100 + 'vw';
+            note.style.color = themeColors[Math.floor(Math.random() * themeColors.length)];
+            note.style.animationDuration = 3 + Math.random() * 3 + 's';
+            note.style.fontSize = (20 + Math.random() * 16) + 'px';
+            
+            document.body.appendChild(note);
+            
+            // Remove the note after animation completes
+            setTimeout(() => {
+                note.remove();
+            }, 7000);
+        }
+
+        // Start the animation when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create initial notes
+            setInterval(createMusicalNote, 500);
+            
+            // Create more notes when user interacts with form
+            const formElements = document.querySelectorAll('#bookingForm input, #bookingForm select, #bookingForm textarea, .time-slot-label');
+            formElements.forEach(element => {
+                element.addEventListener('focus', () => {
+                    for(let i = 0; i < 3; i++) {
+                        setTimeout(createMusicalNote, i * 200);
+                    }
+                });
+                element.addEventListener('click', () => {
+                    for(let i = 0; i < 2; i++) {
+                        setTimeout(createMusicalNote, i * 150);
+                    }
+                });
+            });
+
+            // Extra notes when selecting time slots
+            document.querySelectorAll('.time-slot-label').forEach(label => {
+                label.addEventListener('click', function() {
+                    if (!this.classList.contains('selected')) {
+                        createMusicalNote();
+                        setTimeout(createMusicalNote, 200);
+                    }
+                });
+            });
+        });
 </script>
 </body>
 </html>

@@ -277,9 +277,37 @@
         width: 90%;
         text-align: center;
     }
+    .musical-note {
+            position: fixed;
+            bottom: -50px;
+            font-size: 24px;
+            opacity: 0;
+            z-index: 1000;
+            pointer-events: none;
+            animation: floatUp 4s ease-in-out forwards;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(0.8);
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50vh) rotate(180deg) scale(1.1);
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg) scale(0.8);
+                opacity: 0;
+            }
+        }
 </style>
 </head>
 <body>
+
+    
 
     <header class="header">
         <div class="container">
@@ -372,7 +400,8 @@
                 </div>
 
                 <div class="form-group full-width">
-                    <label class="form-label">Time Slots (1hr each)</label>
+                    <label class="form-label">Time Slots (1hr each) 
+₹100 off per hour for booking more than 2 hour </label>
                     <div class="time-slots-container" id="timeSlots">
                         <!-- Time slots will be generated here -->
                     </div>
@@ -409,7 +438,7 @@
                 <!-- Equipment Setup Field -->
                 <div class="form-group full-width">
                     <label for="equipmentSetup" class="form-label">Equipment Setup </label>
-                    <textarea id="equipmentSetup" name="equipmentSetup" class="form-control" rows="3" required placeholder="Write your  equipment setup "></textarea>
+                    <textarea id="equipmentSetup" name="equipmentSetup" class="form-control" rows="3" required ></textarea>
                 </div>
 
                 <div class="form-group full-width" id="priceSummary">
@@ -746,7 +775,66 @@
     // Close confirmation modal
     function closeModal() {
         document.getElementById('confirmationModal').style.display = 'none';
+
     }
+ // Musical notes animation - using your theme colors
+        function createMusicalNote() {
+            const notes = ['♪', '♫', '♩', '♬', '♭', '♮', '♯'];
+            const themeColors = [
+                '#6c5ce7',  // primary purple
+                '#a29bfe',  // secondary light purple
+                '#fd79a8',  // accent pink
+                '#00cec9',  // teal (complementary)
+                '#fdcb6e',  // yellow (complementary)
+                '#e84393'   // darker pink
+            ];
+            
+            const note = document.createElement('div');
+            note.className = 'musical-note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = Math.random() * 100 + 'vw';
+            note.style.color = themeColors[Math.floor(Math.random() * themeColors.length)];
+            note.style.animationDuration = 3 + Math.random() * 3 + 's';
+            note.style.fontSize = (20 + Math.random() * 16) + 'px';
+            
+            document.body.appendChild(note);
+            
+            // Remove the note after animation completes
+            setTimeout(() => {
+                note.remove();
+            }, 7000);
+        }
+
+        // Start the animation when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create initial notes
+            setInterval(createMusicalNote, 500);
+            
+            // Create more notes when user interacts with form
+            const formElements = document.querySelectorAll('#bookingForm input, #bookingForm select, #bookingForm textarea, .time-slot-label');
+            formElements.forEach(element => {
+                element.addEventListener('focus', () => {
+                    for(let i = 0; i < 3; i++) {
+                        setTimeout(createMusicalNote, i * 200);
+                    }
+                });
+                element.addEventListener('click', () => {
+                    for(let i = 0; i < 2; i++) {
+                        setTimeout(createMusicalNote, i * 150);
+                    }
+                });
+            });
+
+            // Extra notes when selecting time slots
+            document.querySelectorAll('.time-slot-label').forEach(label => {
+                label.addEventListener('click', function() {
+                    if (!this.classList.contains('selected')) {
+                        createMusicalNote();
+                        setTimeout(createMusicalNote, 200);
+                    }
+                });
+            });
+        });
 </script>
 
     
