@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+   <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+
+        .payment-container {
+            max-width: 550px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2d3436;
+        }
+
+        .booking-details {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .booking-details p {
+            margin: 8px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border: 1px solid #ffeeba;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #rzp-button {
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 25px;
+            width: 100%;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <h2>Confirm your details and Proceed payment</h2>
+
+        <div class="booking-details">
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">JamPad:</td>
+            <td style="padding: 8px;">{{ booking.jampad_name }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Band Name:</td>
+            <td style="padding: 8px;">{{ booking.band_name }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Date:</td>
+            <td style="padding: 8px;">{{ booking.booking_date }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Time Slots:</td>
+            <td style="padding: 8px;">{{ booking.time_slots }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Phone:</td>
+            <td style="padding: 8px;">{{ booking.phone }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Email:</td>
+            <td style="padding: 8px;">{{ booking.email }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">No of persons:</td>
+            <td style="padding: 8px;">{{ booking.no_of_people }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Microphones:</td>
+            <td style="padding: 8px;">{{ booking.microphones }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; font-weight: bold;">Amount:</td>
+            <td style="padding: 8px;">₹{{ (amount)|round(2) }}</td>
+        </tr>
+    </table>
+</div>
+        <div class="warning" style="color: red; font-weight: bold; margin-top: 15px;">
+        ⚠️ Please do not refresh or close the page during payment.
+    </div>
+        <div id="loader" style="display: none; text-align: center; margin-top: 15px; font-weight: bold;">Processing Payment...</div>
+
+        <button id="rzp-button" style="
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        ">Pay Now</button>
+    </div>
+
+      <script>
+document.addEventListener("DOMContentLoaded", function () {
+    var btn = document.getElementById('rzp-button');
+    var loader = document.getElementById('loader');
+
+    var options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ amount }}",
+        "currency": "INR",
+        "name": "The Music Junction",
+        "description": "JamPad Booking",
+        "order_id": "{{ order_id }}",
+        "handler": function(response) {
+            fetch("{{ url_for('verify_payment', _external=True) }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    payment_id: response.razorpay_payment_id,
+                    order_id: response.razorpay_order_id,
+                    signature: response.razorpay_signature
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    window.location.href = "{{ url_for('payment_success', _external=True) }}" +
+                        "?payment_id=" + response.razorpay_payment_id +
+                        "&order_id=" + response.razorpay_order_id;
+                } else {
+                    window.location.href = "{{ url_for('payment_failed', _external=True) }}";
+                }
+            })
+            .catch(error => {
+                console.error("Verification error:", error);
+                window.location.href = "{{ url_for('payment_failed', _external=True) }}";
+            });
+        },
+        "prefill": {
+            "name": "{{ name }}",
+            "email": "{{ email }}",
+            "contact": "{{ contact }}"
+        },
+        "theme": {
+            "color": "#6c5ce7"
+        },
+        "modal": {
+            "ondismiss": function() {
+                console.log("Payment modal closed");
+                btn.disabled = false;
+                if (loader) loader.style.display = 'none';
+            }
+        }
+    };
+
+    var rzp = new Razorpay(options);
+
+    rzp.on('payment.failed', function(response) {
+        console.error("Payment failed:", response.error);
+        window.location.href = "{{ url_for('payment_failed', _external=True) }}" +
+            "?error_code=" + response.error.code +
+            "&error_description=" + encodeURIComponent(response.error.description) +
+            "&order_id={{ order_id }}";
+    });
+
+    btn.addEventListener('click', function(e) {
+        btn.disabled = true;
+        if (loader) loader.style.display = 'block';
+        rzp.open();
+        e.preventDefault();
+    });
+});
+</script>
+
+</body>
+</html>

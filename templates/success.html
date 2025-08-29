@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Confirmation | JamPad</title>
+    <style>
+        /* Base Styles */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            color: #000000;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+
+        /* A4 Container */
+        .container {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+
+        /* Watermark */
+        .watermark {
+            position: fixed;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            opacity: 0.15;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .watermark img {
+            width: 400px;
+            height: 400px;
+            object-fit: contain;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, rgb(71, 150, 224), rgb(89, 151, 208)) !important;
+            padding: 25px;
+            text-align: center;
+            color: white !important;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 20px;
+            height: calc(297mm - 160px);
+            box-sizing: border-box;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Details Section */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .detail-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .label {
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 4px;
+        }
+
+        /* Print Optimization */
+        @media print {
+            body {
+                background: white !important;
+                margin: 0 !important;
+            }
+
+            .container {
+                margin: 0 !important;
+                width: 100% !important;
+                height: 100vh !important;
+                border: none !important;
+            }
+
+            .watermark {
+                opacity: 0.2 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Watermark -->
+        <div class="watermark">
+            <img src="/static/assets/img/TMJ.png" alt="Watermark">
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="header">
+                <h1>JAMPAD BOOKING CONFIRMATION</h1>
+                <p>Confirmation ID: {{ booking.confirmation_id }}</p>
+            </div>
+
+            <!-- Status -->
+            <div style="text-align: center; margin: 20px 0;">
+                <div style="font-size: 40px; color: #2dc35f;">✓</div>
+                <h2>🎊 Booking Confirmed Successfully! 🎉</h2>
+            </div>
+
+            <!-- Booking Details -->
+            <div class="detail-card">
+                <h2 style="border-bottom: 2px solid #000; padding-bottom: 8px;">Booking Information</h2>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="label">JamPad Name</div>
+                        <div class="value">{{ booking.jampad_name }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Band Name</div>
+                        <div class="value">{{ booking.band_name }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Booking Date</div>
+                        <div class="value">{{ booking.booking_date }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Time Slot</div>
+                        <div class="value">{{ booking.time_slots }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Participants</div>
+                        <div class="value">{{ booking.no_of_people }} people</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Microphones</div>
+                        <div class="value">{{ booking.microphones }} microphones</div>
+                    </div><!-- Your booking details here -->
+                </div>
+            </div>
+            <br><br>
+
+            <!-- Payment Details -->
+            <div class="detail-card">
+                <h2 style="color: #000000; margin-top: 0; border-bottom: 2px solid #000; padding-bottom: 10px;">Payment Summary</h2>
+                <div class="details-grid">
+                    <!-- Add payment details here -->
+                     <div class="confirmation-box">
+                
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="label">Total Amount</div>
+                        <div class="value">{{ booking.total_price }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Payment Status</div>
+                        <div class="value" style="color: #4CAF50;">Paid ✓</div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="text-align: center; margin-top: 20px; color: #666;">
+                <p>Present this confirmation at reception • Contact: contact.themusicjunction@gmail.com</p>
+                <p>Phone: +91 8076272529</p>
+                <p>⚠️ Entry Rules: Footwear (shoes/slippers) • Cigarettes • Food items strictly prohibited</p>
+                <p>💧 Only sealed drinking water allowed inside jamming room</p>
+            </div>
+        
+
+    <div style="text-align: center; margin: 20px;" class="print-hide">
+        <button onclick="window.print()" style="
+            padding: 12px 30px;
+            background: #3d82c3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;">
+            Print Confirmation
+        </button>
+    </div>
+    </div>
+    </div>
+</body>
+</html>

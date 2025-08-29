@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | The Music Junction</title>
+    <link rel="icon" href="/static/assets/img/TMJ.png" type="image/png">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Your existing header/footer CSS -->
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* Privacy Policy Specific Styles */
+        :root {
+            --primary-color: #6c63ff;
+            --secondary-color: #a29bfe;
+            --accent-color: #fd79a8;
+            --text-color: #2d3436;
+            --light-text: #636e72;
+            --bg-color: #f9f9f9;
+            --section-bg: #ffffff;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.7;
+            padding-top: 80px; /* Account for fixed header */
+        }
+
+        .privacy-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .privacy-hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: var(--border-radius);
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .privacy-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+            z-index: 1;
+        }
+
+        .privacy-hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .privacy-hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            opacity: 0.9;
+        }
+
+        .privacy-content {
+            background-color: var(--section-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .policy-section {
+            margin-bottom: 3rem;
+            position: relative;
+            padding-left: 2rem;
+            border-left: 4px solid var(--secondary-color);
+            transition: all 0.3s ease;
+        }
+
+        .policy-section:hover {
+            border-left-color: var(--accent-color);
+            transform: translateX(5px);
+        }
+
+        .policy-section h2 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .policy-section h2 i {
+            margin-right: 1rem;
+            color: var(--accent-color);
+        }
+
+        .policy-section p {
+            margin-bottom: 1.5rem;
+            color: var(--light-text);
+        }
+
+        .policy-section ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .policy-section li {
+            margin-bottom: 0.8rem;
+            position: relative;
+        }
+
+        .policy-section li::before {
+            content: '•';
+            color: var(--accent-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        .last-updated {
+            text-align: center;
+            font-style: italic;
+            color: var(--light-text);
+            margin-top: 2rem;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 99;
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--accent-color);
+            transform: translateY(-5px);
+        }
+
+        /* Animation classes */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-section {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .privacy-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .privacy-content {
+                padding: 2rem 1.5rem;
+            }
+            
+            .policy-section {
+                padding-left: 1rem;
+            }
+            
+            .policy-section h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .privacy-hero {
+                padding: 3rem 1rem;
+            }
+            
+            .privacy-hero h1 {
+                font-size: 2rem;
+            }
+            
+            .privacy-hero p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Your existing header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-container">
+                <!-- Logo Section -->
+                <a href="index.html" class="logo-section">
+                    <img src="/static/assets/img/TMJ.png" alt="The Music Junction Logo" class="logo-img">
+                    <span class="logo-text">The Music Junction</span>
+                </a>
+
+                <!-- Navigation -->
+                <nav class="navbar">
+                    <div class="menu-toggle" id="mobile-menu">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </div>
+
+                      <ul class="nav-links">
+                        <li><a href="{{ url_for('index') }}" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a href="{{ url_for('jampad') }}" class="nav-link"><i class="fas fa-guitar"></i> Jampad</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="nav-link"><i class="fas fa-phone"></i> Contact</a></li>
+                        <li><a href="{{ url_for('refund') }}" class="nav-link"><i class="fas fa-exchange-alt"></i> Refund Policy</a></li>
+                        <li><a href="{{ url_for('dashjamp') }}" class="nav-link admin-btn"><i class="fas fa-user-cog" target="_blank"></i> Admin</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="privacy-container">
+            <section class="privacy-hero">
+                <h1>Privacy Policy</h1>
+                <p>Your privacy is important to us. Learn how we collect, use, and protect your personal information.</p>
+            </section>
+
+            <div class="privacy-content">
+                <section class="policy-section animate-section" style="animation-delay: 0.1s;">
+                    <h2><i class="fas fa-info-circle"></i> Introduction</h2>
+                    <p>Welcome to The Music Junction's Privacy Policy. This document explains how we collect, use, disclose, and safeguard your information when you visit our website or use our services. Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the site.</p>
+                    <p>We reserve the right to make changes to this Privacy Policy at any time and for any reason. We will alert you about any changes by updating the "Last Updated" date of this Privacy Policy.</p>
+                </section>
+
+                <section class="policy-section animate-section" style="animation-delay: 0.2s;">
+                    <h2><i class="fas fa-database"></i> Information We Collect</h2>
+                    <p>We may collect information about you in a variety of ways. The information we may collect includes:</p>
+                    <ul>
+                        <li><strong>Personal Data:</strong> Personally identifiable information, such as your name, email address, phone number, and demographic information that you voluntarily give to us when you register with the site or when you choose to participate in various activities related to the site.</li>
+                        <li><strong>Payment Information:</strong> If you make purchases through our services, we collect data necessary to process your payment, such as your payment instrument number (credit card number), but we do not store full payment details.</li>
+                        <li><strong>Derivative Data:</strong> Information our servers automatically collect when you access the site, such as your IP address, browser type, operating system, access times, and the pages you have viewed directly before and after accessing the site.</li>
+                        <li><strong>Mobile Device Data:</strong> Device information if you access the site via mobile, such as device ID, model, and location.</li>
+                    </ul>
+                </section>
+
+                <section class="policy-section animate-section" style="animation-delay: 0.3s;">
+                    <h2><i class="fas fa-user-shield"></i> Use of Your Information</h2>
+                    <p>Having accurate information about you permits us to provide you with a smooth, efficient, and customized experience. Specifically, we may use information collected about you via the site to:</p>
+                    <ul>
+                        <li>Create and manage your account.</li>
+                        <li>Process your transactions and send you related information.</li>
+                        <li>Email you regarding your account or order.</li>
+                        <li>Enable user-to-user communications.</li>
+                        <li>Fulfill and manage purchases, orders, payments, and other transactions related to the site.</li>
+                        <li>Generate a personal profile about you to make future visits to the site more personalized.</li>
+                        <li>Increase the efficiency and operation of the site.</li>
+                        <li>Monitor and analyze usage and trends to improve your experience with the site.</li>
+                        <li>Notify you of updates to the site.</li>
+                        <li>Offer new products, services, and/or recommendations to you.</li>
+                        <li>Prevent fraudulent transactions, monitor against theft, and protect against criminal activity.</li>
+                    </ul>
+                </section>
+
+                <section class="policy-section animate-section" style="animation-delay: 0.4s;">
+                    <h2><i class="fas fa-lock"></i> Disclosure of Your Information</h2>
+                    <p>We may share information we have collected about you in certain situations. Your information may be disclosed as follows:</p>
+                    <ul>
+                        <li><strong>By Law or to Protect Rights:</strong> If we believe the release of information about you is necessary to respond to legal process, to investigate or remedy potential violations of our policies, or to protect the rights, property, and safety of others, we may share your information as permitted or required by any applicable law, rule, or regulation.</li>
+                        <li><strong>Third-Party Service Providers:</strong> We may share your information with third parties that perform services for us or on our behalf, including payment processing, data analysis, email delivery, hosting services, customer service, and marketing assistance.</li>
+                        <li><strong>Business Transfers:</strong> We may share or transfer your information in connection with, or during negotiations of, any merger, sale of company assets, financing, or acquisition of all or a portion of our business to another company.</li>
+                    </ul>
+                </section>
+
+                <section class="policy-section animate-section" style="animation-delay: 0.5s;">
+                    <h2><i class="fas fa-cookie-bite"></i> Tracking Technologies</h2>
+                    <p>We may use cookies, web beacons, tracking pixels, and other tracking technologies on the site to help customize the site and improve your experience. Most browsers are set to accept cookies by default. You can remove or reject cookies, but be aware that such action could affect the availability and functionality of the site.</p>
+                    <p>We may also use third-party software to serve ads, implement email marketing campaigns, and manage other interactive marketing initiatives. This third-party software may use cookies or similar tracking technology to help manage and optimize your online experience with us.</p>
+                </section>
+
+                <section class="policy-section animate-section" style="animation-delay: 0.6s;">
+                    <h2><i class="fas fa-shield-alt"></i> Security of Your Information</h2>
+                    <p>We use administrative, technical, and physical security measures to help protect your personal information. While we have taken reasonable steps to secure the personal information you provide to us, please be aware that despite our efforts, no security measures are perfect or impenetrable, and no method of data transmission can be guaranteed against any interception or other type of misuse.</p>
+                    <p>If we learn of a security systems breach, we will inform you and the authorities of the occurrence of the breach in accordance with applicable law.</p>
+                </section>
+
+                <section class="policy-section animate-section" style="animation-delay: 0.7s;">
+                    <h2><i class="fas fa-external-link-alt"></i> Third-Party Websites</h2>
+                    <p>The site may contain links to third-party websites and applications of interest, including advertisements and external services, that are not affiliated with us. Once you have used these links to leave the site, any information you provide to these third parties is not covered by this Privacy Policy, and we cannot guarantee the safety and privacy of your information.</p>
+                    <p>We are not responsible for the content or privacy and security practices and policies of any third parties, including other sites, services or applications that may be linked to or from the site. You should review the policies of such third parties and contact them directly to respond to your questions.</p>
+                </section>
+
+                <section class="policy-section animate-section" style="animation-delay: 0.8s;">
+                    <h2><i class="fas fa-user-edit"></i> Your Rights</h2>
+                    <p>Depending on your location, you may have certain rights regarding your personal information, including:</p>
+                    <ul>
+                        <li>The right to access and receive a copy of your personal data</li>
+                        <li>The right to request correction of any inaccurate personal data</li>
+                        <li>The right to request deletion of your personal data</li>
+                        <li>The right to object to or restrict processing of your personal data</li>
+                        <li>The right to data portability</li>
+                        <li>The right to withdraw consent (where processing is based on consent)</li>
+                    </ul>
+                    <p>To exercise any of these rights, please contact us using the information provided in the Contact Us section below.</p>
+                </section>
+
+                <section class="policy-section animate-section" style="animation-delay: 0.9s;">
+                    <h2><i class="fas fa-envelope"></i> Contact Us</h2>
+                    <p>If you have questions or comments about this Privacy Policy, please contact us at:</p>
+                    <p><strong>The Music Junction</strong><br>
+                    Birbal Rd, Block B, Lajpat Nagar New Delhi 110024<br>
+                    Email: contact.themusicjunction@gmail.com<br>
+                    Phone: +91 8076272529</p>
+                </section>
+
+                <p class="last-updated">Last Updated: May1, 2025</p>
+            </div>
+        </div>
+
+        <div class="back-to-top" id="backToTop">
+            <i class="fas fa-arrow-up"></i>
+        </div>
+    </main>
+
+    <!-- Your existing footer -->
+     <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <img src="/static/assets/img/TMJ.png" alt="The Music Junction Logo">
+                        <span>The Music Junction</span>
+                    </div>
+                    <p class="footer-about">Providing top-quality instrument repair services and premium jamming space
+                        for musicians since 2018.</p>
+                   <div class="footer-social">
+                        <a href="https://www.facebook.com/share/16S2BqRZJU/" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/themusicjunction.in?igsh=bG5rNzU3dG83Mnpn" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/in/ankit-dubey-3259a35a" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://youtube.com/@tmjthemusicjunction?si=-dnGaDbyeMRx0Iq7" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="{{ url_for('jampad') }}"><i class="fas fa-chevron-right"></i> Jampad</a></li>
+                         <li><a href="{{ url_for('admin') }}"><i class="fas fa-chevron-right"></i> Admin</a></li>
+
+
+                        <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+
+
+
+                <div class="footer-col">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-contact">
+                        <li><i class="fas fa-map-marker-alt"></i>Birbal Rd, Block B, Lajpat Nagar New Delhi 110024</li>
+                        <li><i class="fas fa-phone"></i>  <a href="tel:+918076272529">+91 8076272529</a></li>
+                        <li><i class="fas fa-envelope"></i> <a href="mailto:contact@themusicjunction.com">contact.themusicjunction@gmail.com</a></li>
+                        <li><i class="fas fa-clock"></i> Sun-Sat: 10AM - 8PM</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="footer-legal">
+                    <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                    <a href="{{ url_for('terms') }}">Terms and Conditions</a>
+                    <a href="{{ url_for('refund') }}">Refund Policy</a>
+                </div>
+                <div class="copyright">
+                    &copy; 2025 The Music Junction. All Rights Reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Back to Top Button
+        const backToTop = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('active');
+            } else {
+                backToTop.classList.remove('active');
+            }
+        });
+        
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Animate sections on scroll
+        const animateSections = () => {
+            const sections = document.querySelectorAll('.policy-section');
+            
+            sections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (sectionTop < windowHeight - 100) {
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }
+            });
+        };
+
+        // Run once on page load
+        window.addEventListener('load', animateSections);
+        
+        // Run on scroll
+        window.addEventListener('scroll', animateSections);
+
+        // Mobile menu toggle (if not already in your main JS)
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.querySelector('.nav-links');
+        
+        if (mobileMenu) {
+            mobileMenu.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+        }
+    </script>
+</body>
+</html>

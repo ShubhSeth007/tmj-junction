@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='assets/img/TMJ.png') }}" type="image/png">
+    <title>Refund Policy | TMJ & Blue Raga</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        :root {
+            --tmj-color: #6c63ff;
+            --br-color: #2196F3;
+            --accent: #ff6584;
+            --text-dark: #2d3436;
+            --text-light: #636e72;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-dark);
+            line-height: 1.7;
+            margin-top: 100px;
+
+        }
+
+        .refund-section {
+            padding: 4rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        .policy-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeIn 1s;
+        }
+
+        .policy-header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--tmj-color), var(--br-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .last-updated {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--tmj-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Card Container */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Pricing Cards */
+        .jampad-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            border-bottom: 4px solid transparent;
+        }
+
+        .jampad-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tmj-card {
+            border-color: var(--tmj-color);
+            background: linear-gradient(45deg, #ffffff, #f8f7ff);
+        }
+
+        .br-card {
+            border-color: var(--br-color);
+            background: linear-gradient(45deg, #ffffff, #f3f9ff);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .tmj-icon {
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--tmj-color);
+        }
+
+        .br-icon {
+            background: rgba(33, 150, 243, 0.1);
+            color: var(--br-color);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Pricing Details */
+        .price-point {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 0.8rem;
+            background: rgba(255,255,255,0.7);
+        }
+
+        .price-tag {
+            min-width: 80px;
+            padding: 0.4rem 0.8rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+            text-align: center;
+        }
+
+        .tmj-price {
+            background: var(--tmj-color);
+            color: white;
+        }
+
+        .br-price {
+            background: var(--br-color);
+            color: white;
+        }
+
+        /* Cancellation Policy */
+        .cancellation-section {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .timeline {
+            display: grid;
+            gap: 2rem;
+            position: relative;
+        }
+
+        .timeline:before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: #eee;
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            background: rgba(255,255,255,0.9);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            transform: translateX(10px);
+        }
+
+        .warning-box {
+            background: #fff3f3;
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 0.8rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Contact Section */
+        .contact-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 2px dashed #eee;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            border-radius: 1rem;
+            margin: 0.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .tmj-contact {
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--tmj-color);
+        }
+
+        .br-contact {
+            background: rgba(33, 150, 243, 0.1);
+            color: var(--br-color);
+        }
+
+        .contact-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .policy-header h1 {
+                font-size: 2rem;
+            }
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline:before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-container">
+                <!-- Logo Section -->
+                <a href="{{ url_for('index') }}" class="logo-section">
+                     <img src="{{ url_for('static', filename='assets/img/TMJ.png') }}" alt="The Music Junction Logo" class="logo-img">
+                    <span class="logo-text">The Music Junction</span>
+                </a>
+
+                <!-- Navigation -->
+                <nav class="navbar">
+                    <div class="menu-toggle" id="mobile-menu">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </div>
+
+                     <ul class="nav-links">
+                        <li><a href="{{ url_for('index') }}" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a href="{{ url_for('jampad') }}" class="nav-link"><i class="fas fa-guitar"></i> Jampad</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="nav-link"><i class="fas fa-phone"></i> Contact</a></li>
+                        <li><a href="{{ url_for('refund') }}" class="nav-link"><i class="fas fa-exchange-alt"></i> Refund Policy</a></li>
+                        <li><a href="{{ url_for('dashjamp') }}" class="nav-link admin-btn"><i class="fas fa-user-cog" target="_blank"></i> Admin</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="refund-section">
+        <div class="container">
+            <div class="policy-header">
+                <h1>JamPad Refund Policies</h1>
+                <div class="last-updated">Last Updated: May 2025</div>
+            </div>
+
+            <div class="grid-container">
+                <!-- TMJ Card -->
+                <div class="jampad-card tmj-card">
+                    <div class="card-header">
+                        <div class="card-icon tmj-icon">
+                            <i class="fas fa-guitar"></i>
+                        </div>
+                        <h2 class="card-title">The Music Junction Jampad</h2>
+                    </div>
+                    
+                    <div class="price-point">
+                        <span class="price-tag tmj-price">₹599/hr</span>
+                        <div>
+                            <h4>First 2 Hours</h4>
+                            <p class="text-muted">₹499/hr after 2 hours</p>
+                        </div>
+                    </div>
+
+                    <div class="price-point">
+                        <span class="price-tag tmj-price">Free</span>
+                        <div>
+                            <h4>Includes</h4>
+                            <p>9 People • 5 Mics</p>
+                        </div>
+                    </div>
+
+                    <div class="price-point">
+                        <span class="price-tag tmj-price">₹60/extra</span>
+                        <div>
+                            <h4>Additional Charges</h4>
+                            <p>Per person/mic beyond limit</p>
+                        </div>
+                    </div>
+
+                    <div class="price-point">
+                        <span class="price-tag tmj-price">👥 11 Max</span>
+                        <div>
+                            <h4>Capacity</h4>
+                            <p>Maximum participants</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blue Raga Card -->
+                <div class="jampad-card br-card">
+                    <div class="card-header">
+                        <div class="card-icon br-icon">
+                            <i class="fas fa-drum"></i>
+                        </div>
+                        <h2 class="card-title">Blue Raga JamPad</h2>
+                    </div>
+                    
+                    <div class="price-point">
+                        <span class="price-tag br-price">₹410/hr</span>
+                        <div>
+                            <h4>Fixed Rate</h4>
+                            <p class="text-muted">₹360/hr after 2 hours</p>
+                        </div>
+                    </div>
+
+                    <div class="price-point">
+                        <span class="price-tag br-price">Free</span>
+                        <div>
+                            <h4>Includes</h4>
+                            <p>7 People • 5 Mics</p>
+                        </div>
+                    </div>
+
+                    <div class="price-point">
+                        <span class="price-tag br-price">₹60/extra</span>
+                        <div>
+                            <h4>Additional Charges</h4>
+                            <p>Per person/mic beyond limit</p>
+                        </div>
+                    </div>
+
+                    <div class="price-point">
+                        <span class="price-tag br-price">👥 15 Max</span>
+                        <div>
+                            <h4>Capacity</h4>
+                            <p>Maximum participants</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cancellation Policy -->
+            <div class="cancellation-section">
+                <h2 style="margin-bottom: 2rem; color: var(--accent);">Cancellation Policy</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h3>🎉 More than 24 Hours Notice</h3>
+                        <p>50% refund of total booking amount
+                        </p>
+                        <p> If refund is approved the amount will be credited to your bank account within 7-10 days</p>
+                        <div class="warning-box">
+                            <strong>Example:</strong> ₹2000 booking → ₹1000 refund
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <h3>⏰ Within 24 Hours</h3>
+                        <p>Full amount non-refundable</p>
+                        <div class="warning-box">
+                            <strong>Note:</strong> No exceptions for last-minute cancellations
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="contact-card">
+                <h3 style="margin-bottom: 1.5rem;">Need Assistance?</h3>
+                <a href="mailto:contact.themusicjunction@gmail.com" class="contact-link tmj-contact">
+                    <i class="fas fa-envelope" style="margin-right: 0.5rem;"></i>
+                    TMJ Support
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+   <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <img src="/static/assets/img/TMJ.png" alt="The Music Junction Logo">
+                        <span>The Music Junction</span>
+                    </div>
+                    <p class="footer-about">Providing top-quality instrument repair services and premium jamming space
+                        for musicians since 2018.</p>
+                   <div class="footer-social">
+                        <a href="https://www.facebook.com/share/16S2BqRZJU/" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/themusicjunction.in?igsh=bG5rNzU3dG83Mnpn" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/in/ankit-dubey-3259a35a" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://youtube.com/@tmjthemusicjunction?si=-dnGaDbyeMRx0Iq7" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="{{ url_for('jampad') }}"><i class="fas fa-chevron-right"></i> Jampad</a></li>
+                         <li><a href="{{ url_for('admin') }}"><i class="fas fa-chevron-right"></i> Admin</a></li>
+
+
+                        <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+
+
+
+                <div class="footer-col">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-contact">
+                        <li><i class="fas fa-map-marker-alt"></i>Birbal Rd, Block B, Lajpat Nagar New Delhi 110024</li>
+                        <li><i class="fas fa-phone"></i>  <a href="tel:+918076272529">+91 8076272529</a></li>
+                        <li><i class="fas fa-envelope"></i> <a href="mailto:contact@themusicjunction.com">contact.themusicjunction@gmail.com</a></li>
+                        <li><i class="fas fa-clock"></i> Sun-Sat: 10AM - 8PM</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="footer-legal">
+                    <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                    <a href="{{ url_for('terms') }}">Terms and Conditions</a>
+                    <a href="{{ url_for('refund') }}">Refund Policy</a>
+                </div>
+                <div class="copyright">
+                    &copy; 2025 The Music Junction. All Rights Reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+
+        // Animate elements on scroll
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.jampad-card, .timeline-item, .contact-card');
+            elements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                const elementBottom = el.getBoundingClientRect().bottom;
+                const isVisible = (elementTop <= window.innerHeight) && (elementBottom >= 0);
+                
+                if(isVisible) {
+                    el.style.opacity = "1";
+                    el.style.transform = "translateY(0)";
+                }
+            });
+        };
+
+        // Initial animation
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.jampad-card, .timeline-item, .contact-card').forEach(el => {
+                el.style.opacity = "0";
+                el.style.transform = "translateY(20px)";
+                el.style.transition = "all 0.6s cubic-bezier(0.23, 1, 0.32, 1)";
+            });
+            animateOnScroll();
+        });
+
+        // Scroll listener
+        window.addEventListener('scroll', animateOnScroll);
+        // Mobile Menu Toggle
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    menuToggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+        navLinks.classList.toggle('active');
+    });
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            menuToggle.classList.remove('active');
+            navLinks.classList.remove('active');
+        });
+    });
+    </script>
+
+
+
+</body>
+</html>

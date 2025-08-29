@@ -1,0 +1,16 @@
+{
+  "params": {
+    "localserver": "False",
+    "local_uri": "mysql+pymysql://root:@localhost/jampadcontact",
+    "prod_uri": "mysql+pymysql://u976320049_krishnawebsolu:%24Smartshubh4@srv1872.hstgr.io:3306/u976320049_tmjunction",
+    "admin_user":"tmjlogin",
+    "admin_password": "adminspace",
+    "email": "bookings.themusicjunction@gmail.com",
+    "folder_location": "C:\\Users\\shubh seth\\PycharmProjects\\objectdetection\\pythonProject\\venv\\dhrr",
+    "gmail-user": "bookings2.themusicjunction@gmail.com" ,
+    "gmail-password": "spzn bbpk qrlu qrih",
+    "razorpay_key_id": "rzp_live_H7pds9dSMO6ffD",
+    "razorpay_key_secret": "vCGq7Tf8h3WApIn7QHbky3xN",
+    "razorpay_webhook_secret": "your_webhook_secret"
+  }
+}

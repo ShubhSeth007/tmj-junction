@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+Flask-Mail
+requests
+Werkzeug
+gunicorn
+pymysql
+razorpay
+psycopg2-binary

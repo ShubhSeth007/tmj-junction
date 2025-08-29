@@ -1,0 +1,256 @@
+<title>Admin Dashboard</title>
+<link rel="icon" href="{{ url_for('static', filename='assets/img/TMJ.png') }}" type="image/png">
+    <style>
+
+
+        /* Either update style.css with these or vice versa */
+:root {
+    --primary-color: #4361ee;
+    --secondary-color: #3f37c9;
+    --accent-color: #4895ef;
+    --error-color: #f72585;
+    --success-color: #4cc9f0;
+}
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            padding: 40px;
+            position: relative;
+
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+            z-index: 10;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.3) 0%,
+                rgba(255, 255, 255, 0) 60%
+            );
+            transform: rotate(30deg);
+            pointer-events: none;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-header h1 {
+            color: var(--primary-color);
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: var(--dark-color);
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            background-color: white;
+        }
+
+        .input-group label {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            color: #6c757d;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .input-group input:focus + label,
+        .input-group input:not(:placeholder-shown) + label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            background-color: white;
+            padding: 0 5px;
+            color: var(--primary-color);
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        /* Musical Notes Animation */
+        .musical-notes-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 24px;
+            color: white;
+            animation: floatUp 8s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(1);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.2);
+                opacity: 0;
+            }
+        }
+    </style>
+<body>
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="loader">
+            <div class="music-note"></div>
+            <div class="music-note"></div>
+            <div class="music-note"></div>
+        </div>
+    </div>
+
+
+    <div class="musical-notes-container">
+        {% for i in range(20) %}
+            <div class="note" style="left: {{ (loop.index0 * 5) % 100 }}%; animation-delay: {{ loop.index0 * 0.5 }}s;">
+                🎵
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Admin Login</h1>
+            <p>Welcome back! Please enter your credentials.</p>
+        </div>
+        <form action="/dashjamp" method="POST">
+            <div class="input-group">
+                <input type="text" name="username" id="username" placeholder=" " required>
+                <label for="username">Username</label>
+            </div>
+            <div class="input-group">
+                <input type="password" name="password" id="password" placeholder=" " required>
+                <label for="password">Password</label>
+            </div>
+            <div class="forgot-password">
+                <a href="#">Forgot Password?</a>
+            </div>
+            <button type="submit" class="login-button">Login</button>
+            <div class="error-message">Invalid credentials</div>
+            <div class="success-message">Login successful</div>
+        </form>
+    </div>
+

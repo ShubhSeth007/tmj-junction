@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Music Junction - JamPad Booking</title>
+    <link rel="icon" href="{{ url_for('static', filename='assets/img/TMJ.png') }}" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+    :root {
+        --primary: #6c5ce7;
+        --secondary: #a29bfe;
+        --accent: #fd79a8;
+        --dark: #2d3436;
+        --light: #f5f6fa;
+    }
+
+    /* Jampad selection styles */
+    .jampad-option {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .jampad-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .jampad-option label {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background: #f1f1f1;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .jampad-option input[type="radio"]:checked + label {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .jampad-option input[type="radio"]:focus + label {
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+    }
+
+    /* Time slot styles */
+    .time-slot-label {
+        display: block;
+        padding: 0.8rem;
+        background: #f1f1f1;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 5px;
+    }
+
+    .time-slot-label.selected {
+        background: var(--primary);
+        color: white;
+    }
+
+    .time-slot.booked .time-slot-label,
+    .time-slot.past .time-slot-label {
+        background: #e0e0e0;
+        color: #999;
+        cursor: not-allowed;
+        text-decoration: line-through;
+    }
+
+    /* Rest of your existing styles */
+    body {
+        padding-top: 4rem;
+        background-color: #f9f9f9;
+        color: var(--dark);
+        overflow-x: hidden;
+        margin-top: 50px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .gallery-section {
+        margin-bottom: 3rem;
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 2.5rem;
+        color: var(--primary);
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: var(--accent);
+        border-radius: 2px;
+    }
+
+    .gallery-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .gallery-item {
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        aspect-ratio: 16/9;
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .gallery-item img, .gallery-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .media-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        color: white;
+        padding: 1rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .flashes .alert {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    .alert.error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    .alert.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .existing-booking-info {
+        background-color: #fff3cd;
+        border-left: 5px solid #856404;
+        padding: 15px;
+        margin: 15px 0;
+    }
+
+    .gallery-item:hover .media-caption {
+        opacity: 1;
+    }
+
+    .booking-section {
+        background: white;
+        border-radius: 15px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .booking-title {
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+        text-align: center;
+    }
+
+    .booking-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group.full-width {
+        grid-column: span 2;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+    }
+
+    .time-slots-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.8rem;
+        margin-top: 1rem;
+    }
+
+    #priceSummary {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+    }
+    .btn button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.btn-logout button {
+  background-color: #dc3545;
+}
+
+.btn-logout button:hover {
+  background-color: #a71d2a;
+}
+
+.btn-bookings button {
+  background-color: #28a745;
+}
+
+.btn-bookings button:hover {
+  background-color: #1e7e34;
+}
+
+.btn i {
+  font-size: 16px;
+}
+
+    .submit-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        text-align: center;
+    }
+
+     /* Musical Notes Animation - Theme Matched */
+        .musical-note {
+            position: fixed;
+            bottom: -50px;
+            font-size: 24px;
+            opacity: 0;
+            z-index: 1000;
+            pointer-events: none;
+            animation: floatUp 4s ease-in-out forwards;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(0.8);
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50vh) rotate(180deg) scale(1.1);
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg) scale(0.8);
+                opacity: 0;
+            }
+        }
+</style>
+</head>
+<body>
+
+
+
+    <header class="header">
+        <div class="container">
+            <div class="header-container">
+                <!-- Logo Section -->
+                <a href="{{ url_for('index') }}" class="logo-section">
+                     <img src="{{ url_for('static', filename='assets/img/TMJ.png') }}" alt="The Music Junction Logo" class="logo-img">
+                    <span class="logo-text">The Music Junction</span>
+                </a>
+                 <!-- Add this where you want messages to appear -->
+                <!-- Navigation -->
+                <nav class="navbar">
+                    <div class="menu-toggle" id="mobile-menu">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </div>
+
+                    <ul class="nav-links">
+                        <li><a href="{{ url_for('index') }}" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a href="{{ url_for('jampad') }}" class="nav-link"><i class="fas fa-guitar"></i> Jampad</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="nav-link"><i class="fas fa-phone"></i> Contact</a></li>
+                        <li><a href="{{ url_for('refund') }}" class="nav-link"><i class="fas fa-exchange-alt"></i> Refund Policy</a></li>
+                        <li><a href="{{ url_for('dashjamp') }}" class="nav-link admin-btn"><i class="fas fa-user-cog" target="_blank"></i> Admin</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+       
+
+        <!-- Booking Form -->
+        <section class="booking-section">
+            <h2 class="booking-title">Admin Booking Portal</h2>
+            <form id="bookingForm" class="booking-form" action="/jampad" method="post">
+                <div class="form-group full-width">
+                    <label class="form-label">Select JamPad</label>
+                    <div id="slotWarning" style="color: red; font-weight: bold; margin-top: 10px;"></div>
+
+                    <div class="time-slots-container">
+                        <div class="time-slot" style="width:100%">
+                            <input type="radio" name="jampad" id="tmj" value="tmj" checked required>
+                            <label for="tmj" style="width:100%">The Music Junction (₹599/hr)</label>
+                        </div>
+                        <div class="time-slot" style="width:100%">
+                            <input type="radio" name="jampad" id="br" value="br" required>
+                            <label for="br" style="width:100%">Blue Raga (₹410/hr)</label>
+                        </div>
+                    </div>
+                </div>
+<div class="form-group">
+                    <label for="bookingDate" class="form-label">Date</label>
+                    <input type="text" name="bookingDate" id="bookingDate" class="form-control flatpickr-input" readonly required>
+                </div>
+
+                <div class="form-group full-width">
+    <label class="form-label">Time Slots (1hr each)</label>
+    <div class="time-slots-container" id="timeSlots">
+        <!-- Time slots will be generated here -->
+    </div>
+    <input type="hidden" name="timeSlots" id="timeSlotsHidden">
+</div>
+                <div class="form-group">
+                    <label for="bandName" class="form-label">Band Name</label>
+                    <input type="text" name="bandName" id="bandName" class="form-control" required placeholder="Enter your Band Name">
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" name="email" id="email" class="form-control" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone" class="form-label">Phone</label>
+
+                    <input type="tel" id="phone" name="phone" class="form-control"required pattern="^\d{10}$" minlength="10" maxlength="10" placeholder="Enter 10-digit phone number">
+
+                </div>
+
+                <div class="form-group">
+                    <label for="people" class="form-label">Number of People</label>
+                    <input type="number" name="people" id="people" class="form-control"
+                           min="1" required onchange="calculatePrice()" placeholder="9 people for TMJ Jampad  and 7 for BR Jampad are free">
+                </div>
+
+                <div class="form-group">
+                    <label for="mics" class="form-label">Microphones</label>
+                    <input type="number" name="mics" id="mics" class="form-control"
+                           min="0" required onchange="calculatePrice()" PLACEHOLDER="5 Microphones are free for both jampads and Min 0 Max 10">
+                </div>
+
+               <div class="form-group full-width">
+                    <label for="equipmentSetup" class="form-label">Equipment Setup </label>
+                    <textarea id="equipmentSetup" name="equipmentSetup" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="form-group full-width" id="priceSummary">
+                    <h3>Price Breakdown</h3>
+                    <div id="priceDetails"></div>
+                    <h3>Total: ₹<span id="totalAmount">0</span></h3>
+                    <input type="hidden" name="amount" id="amount">
+
+                </div>
+
+                <div class="form-group full-width">
+                     <div class="refund-policy">
+                        <input type="checkbox" id="agreePolicy" required>
+                        <label for="agreePolicy">I have read and agree to the <a href="refund-policy.html" style="color: var(--primary);">Refund policy</a>. </label>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-lock"></i> Submit
+                    </button>
+                    <a href="/logout" class="btn btn-logout">
+  <button type="button">
+    <i class="fas fa-lock" aria-hidden="true"></i> Logout
+  </button>
+</a>
+
+<a href="/view_bookings" class="btn btn-bookings">
+  <button type="button">
+    <i class="fas fa-calendar-check" aria-hidden="true"></i> Bookings
+  </button>
+</a>
+                </div>
+                <div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <h2>Booking Confirmation</h2>
+        <div id="confirmationMessage"></div>
+        <button onclick="closeModal()" class="modal-close">Close</button>
+    </div>
+</div>
+            </form>
+        </section>
+    </div>
+
+
+
+    {% if existing_booking %}
+  <div class="existing-booking-info">
+    <h3>Booking Conflict</h3>
+    <p><strong>Already booked by:</strong> {{ existing_booking.band_name }}</p>
+    <p><strong>Date:</strong> {{ existing_booking.booking_date }}</p>
+    <p><strong>Time Slot(s):</strong> {{ existing_booking.time_slots }}</p>
+  </div>
+{% endif %}
+
+
+    <!-- Footer -->
+     <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <img src="/static/assets/img/TMJ.png" alt="The Music Junction Logo">
+                        <span>The Music Junction</span>
+                    </div>
+                    <p class="footer-about">Providing top-quality instrument repair services and premium jamming space
+                        for musicians since 2018.</p>
+                   <div class="footer-social">
+                        <a href="https://www.facebook.com/share/16S2BqRZJU/" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/themusicjunction.in?igsh=bG5rNzU3dG83Mnpn" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/in/ankit-dubey-3259a35a" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://youtube.com/@tmjthemusicjunction?si=-dnGaDbyeMRx0Iq7" class="social-icon"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="{{ url_for('jampad') }}"><i class="fas fa-chevron-right"></i> Jampad</a></li>
+                         <li><a href="{{ url_for('admin') }}"><i class="fas fa-chevron-right"></i> Admin</a></li>
+
+
+                        <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+
+
+
+                <div class="footer-col">
+                    <h3>Contact Info</h3>
+                    <ul class="footer-contact">
+                        <li><i class="fas fa-map-marker-alt"></i>Birbal Rd, Block B, Lajpat Nagar New Delhi 110024</li>
+                        <li><i class="fas fa-phone"></i>  <a href="tel:+918076272529">+91 8076272529</a></li>
+                        <li><i class="fas fa-envelope"></i> <a href="mailto:contact@themusicjunction.com">contact.themusicjunction@gmail.com</a></li>
+                        <li><i class="fas fa-clock"></i> Sun-Sat: 10AM - 8PM</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="footer-legal">
+                    <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                    <a href="{{ url_for('terms') }}">Terms and Conditions</a>
+                    <a href="{{ url_for('refund') }}">Refund Policy</a>
+                </div>
+                <div class="copyright">
+                    &copy; 2025 The Music Junction. All Rights Reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+
+    let bookedSlots = [];
+    let datePicker;
+
+    // Initialize date picker
+    function initializeDatePicker() {
+        datePicker = flatpickr("#bookingDate", {
+            minDate: "today",
+            dateFormat: "d-m-Y",
+            onChange: function (selectedDates, dateStr) {
+                if (dateStr) {
+                    const parts = dateStr.split("-");
+                    const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    generateTimeSlots();
+                    setTimeout(() => checkBookedSlots(formattedDate), 10);
+                }
+            }
+        });
+    }
+
+    // Generate time slots based on selected jampad
+    function generateTimeSlots() {
+        const timeSlotsContainer = document.getElementById('timeSlots');
+        timeSlotsContainer.innerHTML = '';
+
+        // Get jampad selection
+        const jampad = document.querySelector('input[name="jampad"]:checked').value;
+
+        // Set different hours for each jampad
+        let startHour, endHour;
+        if (jampad === 'tmj') {
+            startHour = 8;  // TMJ: 8 AM to 10 PM
+            endHour = 22;
+        } else {
+            startHour = 9;  // BR: 9 AM to 9 PM
+            endHour = 21;
+        }
+
+        // Get current time
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+
+        // Check if selected date is today
+        const selectedDate = document.getElementById('bookingDate').value;
+        const today = new Date();
+        const todayStr = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth()+1).toString().padStart(2, '0')}-${today.getFullYear()}`;
+        const isToday = selectedDate === todayStr;
+
+        // Generate slots
+        for (let hour = startHour; hour < endHour; hour++) {
+            const startHourStr = hour.toString().padStart(2, '0');
+            const endHourStr = (hour + 1).toString().padStart(2, '0');
+            const slotTime = `${startHourStr}:00-${endHourStr}:00`;
+
+            const slot = document.createElement('div');
+            slot.className = 'time-slot';
+            slot.setAttribute('data-slot', slotTime);
+
+            // Check if slot is in the past (for today only)
+            let isPast = false;
+            if (isToday) {
+                // Slot is past if its hour is less than current hour,
+                // or equal to current hour with minutes already passed
+                isPast = (hour < currentHour) ||
+                         (hour === currentHour && currentMinute > 0);
+            }
+
+            const slotId = `slot${hour}`;
+            slot.innerHTML = `
+                <input type="checkbox" id="${slotId}" name="${slotId}" value="${slotTime}" style="display: none;" ${isPast ? 'disabled' : ''}>
+                <label for="${slotId}" class="time-slot-label">${startHourStr}:00 - ${endHourStr}:00</label>
+            `;
+
+            if (isPast) {
+                slot.classList.add('past');
+            }
+
+            timeSlotsContainer.appendChild(slot);
+        }
+
+        // Add event listeners to the new time slots
+        attachSlotEventListeners();
+    }
+
+    // Add click handlers to time slots
+    function attachSlotEventListeners() {
+        document.querySelectorAll('.time-slot-label').forEach(label => {
+            label.addEventListener('click', function(e) {
+                const checkbox = document.getElementById(label.htmlFor);
+                if (!checkbox.disabled) {
+                    checkbox.checked = !checkbox.checked;
+                    if (checkbox.checked) {
+                        label.classList.add('selected');
+                    } else {
+                        label.classList.remove('selected');
+                    }
+                    calculatePrice();
+                }
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+    }
+
+    // Check for already booked slots
+    async function checkBookedSlots(date) {
+        try {
+            const jampad = document.querySelector('input[name="jampad"]:checked').value;
+            console.log(`Fetching slots for ${jampad} on ${date}`);
+
+            const response = await fetch(`/get_booked_slots?date=${date}&jampad=${encodeURIComponent(jampad)}`);
+            if (!response.ok) throw new Error('Failed to fetch booked slots');
+
+            const data = await response.json();
+            bookedSlots = data.booked_slots || [];
+            console.log("Booked slots received:", bookedSlots);
+
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                const slotTime = slot.dataset.slot;
+                const checkbox = slot.querySelector('input');
+                const label = slot.querySelector('label');
+                const isBooked = bookedSlots.includes(slotTime);
+
+                if (isBooked) {
+                    slot.classList.add('booked');
+                    checkbox.disabled = true;
+                    label.style.cursor = 'not-allowed';
+                    label.style.opacity = '0.6';
+                } else {
+                    slot.classList.remove('booked');
+                    checkbox.disabled = false;
+                    label.style.cursor = 'pointer';
+                    label.style.opacity = '1';
+                }
+            });
+
+        } catch (error) {
+            console.error('Error checking booked slots:', error);
+        }
+    }
+
+    // Calculate booking price
+    function calculatePrice(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        const isTMJ = document.getElementById('tmj').checked;
+        const people = parseInt(document.getElementById('people').value) || 0;
+        const mics = parseInt(document.getElementById('mics').value) || 0;
+        const slots = document.querySelectorAll('input[type="checkbox"][name^="slot"]:checked').length;
+
+        const maxPeople = isTMJ ? 11 : 15;
+        document.getElementById('people').max = maxPeople;
+
+        if (people > maxPeople) {
+            alert(`Maximum ${maxPeople} people allowed for this JamPad`);
+            document.getElementById('people').value = maxPeople;
+            return;
+        }
+
+        let basePrice = 0;
+        if (isTMJ) {
+            basePrice = slots >= 2 ? 1198 + (slots - 2) * 499 : 599 * slots;
+        } else {
+            basePrice = slots >= 2 ? 820 + (slots - 2) * 360 : 410 * slots;
+        }
+
+        const freePeople = isTMJ ? 9 : 7;
+        const freeMics = 5;
+        const peopleCharge = Math.max(people - freePeople, 0) * 60;
+        const micCharge = Math.max(mics - freeMics, 0) * 60;
+
+        const total = basePrice + peopleCharge + micCharge;
+
+        document.getElementById('priceDetails').innerHTML = `
+            <p>Base Price (${slots} hrs): ₹${basePrice}</p>
+            ${peopleCharge > 0 ? `<p>Extra People: ₹${peopleCharge}</p>` : ''}
+            ${micCharge > 0 ? `<p>Extra Mics: ₹${micCharge}</p>` : ''}
+        `;
+
+        document.getElementById('totalAmount').textContent = total;
+        document.getElementById('amount').value = total;
+    }
+
+    // Handle form submission
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Validate form
+        const timeSlots = Array.from(document.querySelectorAll('input[type="checkbox"][name^="slot"]:checked'))
+                             .map(checkbox => checkbox.value);
+
+        if (timeSlots.length === 0) {
+            alert("Please select at least one time slot");
+            return;
+        }
+
+        document.getElementById('timeSlotsHidden').value = timeSlots.join(',');
+
+        // Submit form
+        this.submit();
+    });
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeDatePicker();
+
+        // Initialize jampad selection
+        document.querySelectorAll('input[name="jampad"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                generateTimeSlots();
+                const date = document.getElementById('bookingDate').value;
+                if (date) {
+                    const parts = date.split("-");
+                    const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    checkBookedSlots(formattedDate);
+                }
+                calculatePrice();
+            });
+        });
+
+        // Generate initial time slots
+        generateTimeSlots();
+
+        // Mobile menu toggle
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (mobileMenu) {
+            mobileMenu.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+        }
+    });
+
+    // Close confirmation modal
+    function closeModal() {
+        document.getElementById('confirmationModal').style.display = 'none';
+    }
+
+     // Musical notes animation - using your theme colors
+        function createMusicalNote() {
+            const notes = ['♪', '♫', '♩', '♬', '♭', '♮', '♯'];
+            const themeColors = [
+                '#6c5ce7',  // primary purple
+                '#a29bfe',  // secondary light purple
+                '#fd79a8',  // accent pink
+                '#00cec9',  // teal (complementary)
+                '#fdcb6e',  // yellow (complementary)
+                '#e84393'   // darker pink
+            ];
+            
+            const note = document.createElement('div');
+            note.className = 'musical-note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = Math.random() * 100 + 'vw';
+            note.style.color = themeColors[Math.floor(Math.random() * themeColors.length)];
+            note.style.animationDuration = 3 + Math.random() * 3 + 's';
+            note.style.fontSize = (20 + Math.random() * 16) + 'px';
+            
+            document.body.appendChild(note);
+            
+            // Remove the note after animation completes
+            setTimeout(() => {
+                note.remove();
+            }, 7000);
+        }
+
+        // Start the animation when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create initial notes
+            setInterval(createMusicalNote, 500);
+            
+            // Create more notes when user interacts with form
+            const formElements = document.querySelectorAll('#bookingForm input, #bookingForm select, #bookingForm textarea, .time-slot-label');
+            formElements.forEach(element => {
+                element.addEventListener('focus', () => {
+                    for(let i = 0; i < 3; i++) {
+                        setTimeout(createMusicalNote, i * 200);
+                    }
+                });
+                element.addEventListener('click', () => {
+                    for(let i = 0; i < 2; i++) {
+                        setTimeout(createMusicalNote, i * 150);
+                    }
+                });
+            });
+
+            // Extra notes when selecting time slots
+            document.querySelectorAll('.time-slot-label').forEach(label => {
+                label.addEventListener('click', function() {
+                    if (!this.classList.contains('selected')) {
+                        createMusicalNote();
+                        setTimeout(createMusicalNote, 200);
+                    }
+                });
+            });
+        });
+</script>
+</body>
+</html>
